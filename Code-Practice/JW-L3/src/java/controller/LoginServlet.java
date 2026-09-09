@@ -16,26 +16,23 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author Trung Anh
  */
+// bản chất là đang giao tiếp với server -> tomcat
+// Nó nói với Tomcat:
+// Nếu có request tới /login, hãy giao request này cho LoginServlet.java
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
+
+// extends HttpServlet là để kế thừa lại --> trong serlet có doget và dopost để chơi như ở dưới
 public class LoginServlet extends HttpServlet {
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet LoginServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet LoginServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
+    // Khi browser gửi HTTP GET tới Servlet này, Tomcat sẽ gọi tới doGet
+    // ví dụ khi enter http://localhost:8080/LoginServlet/login 
+    // thì thực chất là: GET /ServletPractice/hello HTTP/1.1 giống burp suite chưa hẹ hẹ
+    // khi Tomcat nhận: GET --> /login --> LoginServlet.java --> gọi vào doGet
+    // chỉ mới gọi và biết đường đi chưa chạy nhé
+    
+    
+    
+    // HttpServletResponse response thì ta biết là request chứa những thứ client gửi lên server.
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -49,12 +46,12 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        
+
         if (username.equals("admin") && password.equals("123")) {
             // cái này test
             //request.setAttribute("message", "xin chao" + username);
             //request.getRequestDispatcher("home.jsp").forward(request, response);
-            
+
             response.sendRedirect("home");
         } else {
             response.sendRedirect("login?error=true");
