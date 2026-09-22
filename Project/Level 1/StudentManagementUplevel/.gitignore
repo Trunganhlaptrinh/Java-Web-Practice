@@ -1,0 +1,20 @@
+# Maven
+target/
+
+# NetBeans
+nbproject/private/
+nb-configuration.xml
+build/
+dist/
+
+# IDE khac (phong khi doi may/IDE sau nay)
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Log
+*.log

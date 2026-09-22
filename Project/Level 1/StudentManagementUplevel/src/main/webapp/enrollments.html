@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đăng ký môn</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Đăng ký môn học</h1>
+
+        <div class="card">
+            <h2>Đăng ký mới</h2>
+            <form id="form" class="form-row">
+                <div class="field">
+                    <label for="studentId">Sinh viên</label>
+                    <select id="studentId" required></select>
+                </div>
+                <div class="field">
+                    <label for="courseId">Môn học</label>
+                    <select id="courseId" required></select>
+                </div>
+                <div class="field">
+                    <label for="enrolledDate">Ngày đăng ký</label>
+                    <input id="enrolledDate" type="date" required>
+                </div>
+                <button class="btn primary" type="submit">Đăng ký</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="toolbar">
+                <select id="filterStudent"></select>
+                <select id="filterCourse"></select>
+                <button class="btn" id="btnAll" type="button">Xem tất cả</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>ID</th><th>Sinh viên</th><th>Môn học</th><th>Ngày đăng ký</th><th>Thao tác</th></tr></thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        renderNav('enrollments');
+
+        async function loadOptions() {
+            try {
+                const [students, courses] = await Promise.all([apiCall('students'), apiCall('courses')]);
+                const studentLabel = s => s.name + ' (#' + s.id + ')';
+                fillSelect($('studentId'), students.data, s => s.id, studentLabel, '-- Chọn sinh viên --');
+                fillSelect($('filterStudent'), students.data, s => s.id, studentLabel, 'Lọc theo sinh viên');
+                fillSelect($('courseId'), courses.data, c => c.id, c => c.name, '-- Chọn môn học --');
+                fillSelect($('filterCourse'), courses.data, c => c.id, c => c.name, 'Lọc theo môn học');
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        }
+
+        // Chi loc theo 1 tieu chi tai 1 thoi diem (khop voi API: studentId HOAC courseId)
+        async function load() {
+            const studentId = $('filterStudent').value;
+            const courseId = $('filterCourse').value;
+            let path = 'enrollments';
+            if (studentId) path += '?studentId=' + studentId;
+            else if (courseId) path += '?courseId=' + courseId;
+
+            try {
+                const res = await apiCall(path);
+                $('tbody').innerHTML = res.data.length
+                    ? res.data.map(e => `
+                        <tr>
+                            <td>${e.id}</td>
+                            <td>${esc(e.studentName)}</td>
+                            <td>${esc(e.courseName)}</td>
+                            <td>${esc(e.enrolledDate)}</td>
+                            <td class="actions">
+                                <button class="btn small danger" data-id="${e.id}">Hủy đăng ký</button>
+                            </td>
+                        </tr>`).join('')
+                    : '<tr><td colspan="5" class="empty">Không có đăng ký nào</td></tr>';
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        }
+
+        $('form').addEventListener('submit', async ev => {
+            ev.preventDefault();
+            const body = {
+                studentId: Number($('studentId').value),
+                courseId: Number($('courseId').value),
+                enrolledDate: $('enrolledDate').value
+            };
+            try {
+                const res = await apiCall('enrollments', 'POST', body);
+                toast(res.message, 'success');
+                load();
+            } catch (e) {
+                toast(e.message, 'error'); // vd: dang ky trung
+            }
+        });
+
+        $('filterStudent').addEventListener('change', () => { $('filterCourse').value = ''; load(); });
+        $('filterCourse').addEventListener('change', () => { $('filterStudent').value = ''; load(); });
+        $('btnAll').addEventListener('click', () => {
+            $('filterStudent').value = '';
+            $('filterCourse').value = '';
+            load();
+        });
+
+        $('tbody').addEventListener('click', async ev => {
+            const btn = ev.target.closest('button[data-id]');
+            if (!btn) return;
+            if (!confirm('Hủy đăng ký này?')) return;
+            try {
+                const res = await apiCall('enrollments?id=' + btn.dataset.id, 'DELETE');
+                toast(res.message, 'success');
+                load();
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        });
+
+        // Trang khac (Sinh vien / Mon hoc) link sang day kem ?studentId= hoac ?courseId=
+        $('enrolledDate').value = today();
+        loadOptions().then(() => {
+            const params = new URLSearchParams(location.search);
+            if (params.get('studentId')) $('filterStudent').value = params.get('studentId');
+            else if (params.get('courseId')) $('filterCourse').value = params.get('courseId');
+            load();
+        });
+    </script>
+</body>
+</html>

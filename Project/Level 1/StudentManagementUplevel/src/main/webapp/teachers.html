@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Giáo viên</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Quản lý Giáo viên</h1>
+
+        <div class="card">
+            <h2 id="formTitle">Thêm giáo viên</h2>
+            <form id="form" class="form-row">
+                <input type="hidden" id="id">
+                <div class="field">
+                    <label for="name">Tên giáo viên</label>
+                    <input id="name" required maxlength="100" placeholder="Chỉ chữ cái và khoảng trắng">
+                </div>
+                <div class="field">
+                    <label for="departmentId">Khoa</label>
+                    <select id="departmentId" required></select>
+                </div>
+                <button class="btn primary" type="submit">Lưu</button>
+                <button class="btn" type="button" id="btnCancel">Hủy</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="toolbar">
+                <select id="filterDept"></select>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>ID</th><th>Tên</th><th>Khoa</th><th>Thao tác</th></tr></thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        renderNav('teachers');
+        let cache = [];
+
+        async function loadDepartments() {
+            try {
+                const res = await apiCall('departments');
+                fillSelect($('departmentId'), res.data, d => d.id, d => d.name, '-- Chọn khoa --');
+                fillSelect($('filterDept'), res.data, d => d.id, d => d.name, 'Tất cả khoa');
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        }
+
+        async function load() {
+            try {
+                const deptId = $('filterDept').value;
+                const res = await apiCall(deptId ? 'teachers?departmentId=' + deptId : 'teachers');
+                cache = res.data;
+                $('tbody').innerHTML = cache.length
+                    ? cache.map(t => `
+                        <tr>
+                            <td>${t.id}</td>
+                            <td>${esc(t.name)}</td>
+                            <td>${esc(t.departmentName)}</td>
+                            <td class="actions">
+                                <button class="btn small" data-action="edit" data-id="${t.id}">Sửa</button>
+                                <button class="btn small danger" data-action="delete" data-id="${t.id}">Xóa</button>
+                            </td>
+                        </tr>`).join('')
+                    : '<tr><td colspan="4" class="empty">Chưa có dữ liệu</td></tr>';
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        }
+
+        function resetForm() {
+            $('form').reset();
+            $('id').value = '';
+            $('formTitle').textContent = 'Thêm giáo viên';
+        }
+
+        $('form').addEventListener('submit', async ev => {
+            ev.preventDefault();
+            const id = $('id').value;
+            const body = {
+                name: $('name').value.trim(),
+                departmentId: Number($('departmentId').value)
+            };
+            try {
+                let res;
+                if (id) {
+                    body.id = Number(id);
+                    res = await apiCall('teachers', 'PUT', body);
+                } else {
+                    res = await apiCall('teachers', 'POST', body);
+                }
+                toast(res.message, 'success');
+                resetForm();
+                load();
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        });
+
+        $('btnCancel').addEventListener('click', resetForm);
+        $('filterDept').addEventListener('change', load);
+
+        $('tbody').addEventListener('click', async ev => {
+            const btn = ev.target.closest('button[data-action]');
+            if (!btn) return;
+            const id = Number(btn.dataset.id);
+
+            if (btn.dataset.action === 'edit') {
+                const t = cache.find(x => x.id === id);
+                $('id').value = t.id;
+                $('name').value = t.name;
+                $('departmentId').value = t.departmentId;
+                $('formTitle').textContent = 'Sửa giáo viên #' + t.id;
+                $('name').focus();
+            } else if (btn.dataset.action === 'delete') {
+                if (!confirm('Xóa giáo viên này? (các liên kết với môn học cũng bị xóa)')) return;
+                try {
+                    const res = await apiCall('teachers?id=' + id, 'DELETE');
+                    toast(res.message, 'success');
+                    load();
+                } catch (e) {
+                    toast(e.message, 'error');
+                }
+            }
+        });
+
+        // phai load department xong roi moi load teacher
+        loadDepartments().then(load);
+    </script>
+</body>
+</html>

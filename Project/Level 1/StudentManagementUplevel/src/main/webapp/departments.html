@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Khoa</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Quản lý Khoa</h1>
+
+        <div class="card">
+            <h2 id="formTitle">Thêm khoa</h2>
+            <form id="form" class="form-row">
+                <input type="hidden" id="id">
+                <div class="field">
+                    <label for="name">Tên khoa</label>
+                    <input id="name" required maxlength="100" placeholder="VD: Computer Science">
+                </div>
+                <button class="btn primary" type="submit">Lưu</button>
+                <button class="btn" type="button" id="btnCancel">Hủy</button>
+            </form>
+        </div>
+
+        <div class="card table-wrap">
+            <table>
+                <thead><tr><th>ID</th><th>Tên khoa</th><th>Thao tác</th></tr></thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        renderNav('departments');
+        let cache = [];
+
+        async function load() {
+            try {
+                const res = await apiCall('departments');
+                cache = res.data;
+                $('tbody').innerHTML = cache.length
+                    ? cache.map(d => `
+                        <tr>
+                            <td>${d.id}</td>
+                            <td>${esc(d.name)}</td>
+                            <td class="actions">
+                                <button class="btn small" data-action="edit" data-id="${d.id}">Sửa</button>
+                                <button class="btn small danger" data-action="delete" data-id="${d.id}">Xóa</button>
+                            </td>
+                        </tr>`).join('')
+                    : '<tr><td colspan="3" class="empty">Chưa có dữ liệu</td></tr>';
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        }
+
+        function resetForm() {
+            $('form').reset();
+            $('id').value = '';
+            $('formTitle').textContent = 'Thêm khoa';
+        }
+
+        // Them (POST) hoac sua (PUT) tuy co id an hay khong
+        $('form').addEventListener('submit', async ev => {
+            ev.preventDefault();
+            const id = $('id').value;
+            const body = { name: $('name').value.trim() };
+            try {
+                let res;
+                if (id) {
+                    body.id = Number(id);
+                    res = await apiCall('departments', 'PUT', body);
+                } else {
+                    res = await apiCall('departments', 'POST', body);
+                }
+                toast(res.message, 'success');
+                resetForm();
+                load();
+            } catch (e) {
+                toast(e.message, 'error');
+            }
+        });
+
+        $('btnCancel').addEventListener('click', resetForm);
+
+        // event delegation: 1 listener cho ca bang thay vi gan onclick tung nut
+        $('tbody').addEventListener('click', async ev => {
+            const btn = ev.target.closest('button[data-action]');
+            if (!btn) return;
+            const id = Number(btn.dataset.id);
+
+            if (btn.dataset.action === 'edit') {
+                const d = cache.find(x => x.id === id);
+                $('id').value = d.id;
+                $('name').value = d.name;
+                $('formTitle').textContent = 'Sửa khoa #' + d.id;
+                $('name').focus();
+            } else if (btn.dataset.action === 'delete') {
+                if (!confirm('Xóa khoa này?')) return;
+                try {
+                    const res = await apiCall('departments?id=' + id, 'DELETE');
+                    toast(res.message, 'success');
+                    load();
+                } catch (e) {
+                    toast(e.message, 'error');
+                }
+            }
+        });
+
+        load();
+    </script>
+</body>
+</html>

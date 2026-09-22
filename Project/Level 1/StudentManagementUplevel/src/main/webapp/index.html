@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Student Course Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Tổng quan</h1>
+        <div class="grid">
+            <a class="stat" href="departments.html"><div class="num" id="cntDepartments">-</div><div class="label">Khoa</div></a>
+            <a class="stat" href="teachers.html"><div class="num" id="cntTeachers">-</div><div class="label">Giáo viên</div></a>
+            <a class="stat" href="courses.html"><div class="num" id="cntCourses">-</div><div class="label">Môn học</div></a>
+            <a class="stat" href="students.html"><div class="num" id="cntStudents">-</div><div class="label">Sinh viên</div></a>
+            <a class="stat" href="enrollments.html"><div class="num" id="cntEnrollments">-</div><div class="label">Lượt đăng ký</div></a>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        renderNav('index');
+
+        // moi o thong ke goi 1 API lay danh sach roi dem so phan tu
+        const targets = [
+            ['departments', 'cntDepartments'],
+            ['teachers', 'cntTeachers'],
+            ['courses', 'cntCourses'],
+            ['students', 'cntStudents'],
+            ['enrollments', 'cntEnrollments']
+        ];
+        targets.forEach(async ([path, elId]) => {
+            try {
+                const res = await apiCall(path);
+                $(elId).textContent = res.data.length;
+            } catch (e) {
+                toast(path + ': ' + e.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

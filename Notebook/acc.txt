@@ -1,0 +1,8 @@
+
+Tomcat:
+trunganh
+123
+
+MySQL:
+root
+root
