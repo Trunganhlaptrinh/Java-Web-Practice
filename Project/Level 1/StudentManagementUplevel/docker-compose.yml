@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: scm-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      # map ra 3307 tren may that, tranh trung voi MySQL local (neu ban van con
+      # dang chay MySQL tren 3306 de mo bang Workbench song song)
+      - "3307:3306"
+    volumes:
+      - scm_mysql_data:/var/lib/mysql
+      # chi chay 1 LAN DUY NHAT: khi thu muc data cua MySQL con rong (lan dau
+      # tao container). Neu muon chay lai schema, phai xoa volume truoc
+      # (xem huong dan "reset du lieu" ben duoi).
+      - ./database/student_managment_database.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: scm-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: "jdbc:mysql://db:3306/student_course_management?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      DB_USER: root
+      DB_PASSWORD: root
+    ports:
+      - "1234:8080"
+
+volumes:
+  scm_mysql_data:

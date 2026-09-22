@@ -1,0 +1,6 @@
+target/
+.git/
+.gitignore
+nb-configuration.xml
+*.md
+database/
