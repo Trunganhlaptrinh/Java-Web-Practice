@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý tài chính cá nhân</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="nav"></div>
+    <main class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Tổng quan tài chính</p>
+                <h1>Tháng <span id="current-month"></span></h1>
+            </div>
+            <a class="btn primary" href="transactions.html">+ Thêm giao dịch</a>
+        </div>
+        <section class="stats" aria-label="Tổng quan tháng">
+            <article class="stat income"><span class="label">Tổng tiền vào</span><strong id="income-total">0 VND</strong></article>
+            <article class="stat expense"><span class="label">Tổng tiền ra</span><strong id="expense-total">0 VND</strong></article>
+            <article class="stat balance"><span class="label">Số dư</span><strong id="balance-total">0 VND</strong></article>
+        </section>
+        <section class="card">
+            <div class="section-head"><h2>Chi tiết theo danh mục</h2><a class="link" href="transactions.html">Xem lịch sử</a></div>
+            <div id="category-summary" class="summary-list"><p class="muted">Đang tải dữ liệu...</p></div>
+        </section>
+    </main>
+    <div id="toast-box"></div>
+    <script src="js/common.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

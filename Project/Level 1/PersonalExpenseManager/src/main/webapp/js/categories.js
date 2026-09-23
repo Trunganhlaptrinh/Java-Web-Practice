@@ -1,0 +1,69 @@
+renderNav("categories");
+let categoryItems = [];
+async function loadCategories() {
+  try {
+    categoryItems = await apiCall("categories");
+    $("category-rows").innerHTML = categoryItems.length
+      ? categoryItems
+          .map(
+            (item) =>
+              `<tr><td>${esc(item.name)}</td><td>${item.type === "INCOME" ? "Thu nhập" : "Chi tiêu"}</td><td class="actions"><button class="btn small" data-edit="${item.id}">Sửa</button><button class="btn danger small" data-delete="${item.id}">Xóa</button></td></tr>`,
+          )
+          .join("")
+      : '<tr><td colspan="3" class="muted">Chưa có danh mục.</td></tr>';
+  } catch (error) {
+    toast(error.message, "error");
+  }
+}
+function resetCategory() {
+  $("category-form").reset();
+  $("category-id").value = "";
+  $("category-form-title").textContent = "Thêm danh mục";
+  $("category-cancel").hidden = true;
+}
+$("category-cancel").addEventListener("click", resetCategory);
+$("category-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const id = $("category-id").value;
+  const body = {
+    name: $("category-name").value,
+    type: $("category-type").value,
+  };
+  try {
+    await apiCall(
+      "categories",
+      id ? "PUT" : "POST",
+      id ? { ...body, id: Number(id) } : body,
+    );
+    toast(id ? "Đã cập nhật danh mục" : "Đã thêm danh mục", "success");
+    resetCategory();
+    await loadCategories();
+  } catch (error) {
+    toast(error.message, "error");
+  }
+});
+$("category-rows").addEventListener("click", async (event) => {
+  const item = categoryItems.find(
+    (row) => String(row.id) === event.target.dataset.edit,
+  );
+  if (item) {
+    $("category-id").value = item.id;
+    $("category-name").value = item.name;
+    $("category-type").value = item.type;
+    $("category-form-title").textContent = "Sửa danh mục";
+    $("category-cancel").hidden = false;
+  }
+  if (
+    event.target.dataset.delete &&
+    confirm("Xóa danh mục? Các giao dịch cũ vẫn được giữ lại.")
+  ) {
+    try {
+      await apiCall("categories?id=" + event.target.dataset.delete, "DELETE");
+      toast("Đã xóa danh mục", "success");
+      await loadCategories();
+    } catch (error) {
+      toast(error.message, "error");
+    }
+  }
+});
+loadCategories();

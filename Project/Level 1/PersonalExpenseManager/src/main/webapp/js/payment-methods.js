@@ -1,0 +1,68 @@
+renderNav("methods");
+let methodItems = [];
+async function loadMethods() {
+  try {
+    methodItems = await apiCall("payment-methods");
+    $("method-rows").innerHTML = methodItems.length
+      ? methodItems
+          .map(
+            (item) =>
+              `<tr><td>${esc(item.name)}</td><td class="actions"><button class="btn small" data-edit="${item.id}">Sửa</button><button class="btn danger small" data-delete="${item.id}">Xóa</button></td></tr>`,
+          )
+          .join("")
+      : '<tr><td colspan="2" class="muted">Chưa có phương thức.</td></tr>';
+  } catch (error) {
+    toast(error.message, "error");
+  }
+}
+function resetMethod() {
+  $("method-form").reset();
+  $("method-id").value = "";
+  $("method-form-title").textContent = "Thêm phương thức";
+  $("method-cancel").hidden = true;
+}
+$("method-cancel").addEventListener("click", resetMethod);
+$("method-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const id = $("method-id").value;
+  const body = { name: $("method-name").value };
+  try {
+    await apiCall(
+      "payment-methods",
+      id ? "PUT" : "POST",
+      id ? { ...body, id: Number(id) } : body,
+    );
+    toast(id ? "Đã cập nhật phương thức" : "Đã thêm phương thức", "success");
+    resetMethod();
+    await loadMethods();
+  } catch (error) {
+    toast(error.message, "error");
+  }
+});
+$("method-rows").addEventListener("click", async (event) => {
+  const item = methodItems.find(
+    (row) => String(row.id) === event.target.dataset.edit,
+  );
+  if (item) {
+    $("method-id").value = item.id;
+    $("method-name").value = item.name;
+    $("method-form-title").textContent = "Sửa phương thức";
+    $("method-cancel").hidden = false;
+  }
+  if (
+    event.target.dataset.delete &&
+    confirm("Xóa phương thức? Giao dịch cũ sẽ hiển thị Không xác định.")
+  ) {
+    try {
+      await apiCall(
+        "payment-methods?id=" + event.target.dataset.delete,
+        "DELETE",
+      );
+      toast("Đã xóa phương thức", "success");
+      await loadMethods();
+    } catch (error) {
+      toast(error.message, "error");
+    }
+  }
+});
+loadMethods();

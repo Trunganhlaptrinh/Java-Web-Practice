@@ -1,0 +1,34 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: pem-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - pem_mysql_data:/var/lib/mysql
+      - ./database/personal_expense_database.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: pem-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: "jdbc:mysql://db:3306/personal_expense_manager?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"
+      DB_USER: root
+      DB_PASSWORD: root
+    ports:
+      - "1234:8080"
+
+volumes:
+  pem_mysql_data:
