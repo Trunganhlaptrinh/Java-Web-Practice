@@ -3,7 +3,7 @@
 
 Cần cài và mở Docker Desktop trước khi chạy.
 
-## Chạy ứng dụng
+## Chạy ứng dụng trong "1 lệnh duy nhất"
 
 ### CMD
 
@@ -25,15 +25,19 @@ Start-Process "http://localhost:1234/Personal-Expense-Manager/"
 
 Ứng dụng sẽ tự mở tại:
 
+(hoặc muốn xem lại thì nhấn vào link này)
+
 http://localhost:1234/Personal-Expense-Manager/
 
-## Dừng ứng dụng
+
+
+## Xóa ứng dụng (xóa container này)
 
 ```bat
 docker compose down
 ```
 
-## Reset database
+## Reset database và chạy lại 
 
 ```bat
 docker compose down -v
@@ -41,4 +45,3 @@ docker compose up -d --build
 start "" "http://localhost:1234/Personal-Expense-Manager/"
 ```
 
-Lệnh này xóa dữ liệu hiện tại và tạo lại database mẫu.
