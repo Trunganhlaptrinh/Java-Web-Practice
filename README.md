@@ -10,7 +10,7 @@ Project       --> Dự án đã làm (có docker lại theo từng project riên
 
 ## Project (Live Demo)
 
-Khuyên khích và folder Project và chạy docker để trải nghiệm hơn, vì các bản live thường hay lỗi database, 1 phần do các dịch vụ free thường khá ít nên hay bị lỗi database
+Khuyên khích vào folder Project và chạy docker để trải nghiệm hơn, vì các bản live thường hay lỗi database, 1 phần do các dịch vụ free thường khá ít nên hay bị lỗi database
 ### L1
 
 Student Management Uplevel: 
