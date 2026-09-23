@@ -1,47 +1,35 @@
 
-# Personal Expense Manager
+## Chạy bằng Docker (khuyên dùng)
 
-Cần cài và mở Docker Desktop trước khi chạy.
+Chỉ cần cài **Docker Desktop**, không cần cài Java, Maven, MySQL hoặc Tomcat trên máy.
 
-## Chạy ứng dụng trong "1 lệnh duy nhất"
-
-### CMD
+Mở CMD và copy/paste:
 
 ```bat
 git clone https://github.com/Trunganhlaptrinh/Java-Web-Practice.git
 cd /d "Java-Web-Practice/Project/Level 1/PersonalExpenseManager"
-docker compose up -d --build
-start "" "http://localhost:1234/Personal-Expense-Manager/"
+docker compose up --build
 ```
 
-### PowerShell
+Lần đầu build sẽ mất khoảng 2-3 phút để tải image Maven, Tomcat, MySQL và build ứng dụng.
 
-```powershell
-git clone https://github.com/Trunganhlaptrinh/Java-Web-Practice.git
-Set-Location "Java-Web-Practice/Project/Level 1/PersonalExpenseManager"
-docker compose up -d --build
-Start-Process "http://localhost:1234/Personal-Expense-Manager/"
-```
+Khi thấy dòng `Server startup in [...] milliseconds`, mở trình duyệt tại:
 
-Ứng dụng sẽ tự mở tại:
-
-(hoặc muốn xem lại thì nhấn vào link này)
-
-http://localhost:1234/Personal-Expense-Manager/
+**http://localhost:1234**
 
 
+## Dừng ứng dụng
 
-## Xóa ứng dụng (xóa container này)
+Nhấn `Ctrl+C` trong cửa sổ đang chạy Docker, sau đó dùng:
 
 ```bat
 docker compose down
 ```
 
-## Reset database và chạy lại 
+## Xóa database và chạy lại từ đầu
 
 ```bat
 docker compose down -v
-docker compose up -d --build
-start "" "http://localhost:1234/Personal-Expense-Manager/"
+docker compose up --build
 ```
 
