@@ -11,9 +11,12 @@ import java.sql.SQLException;
 import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/api/dashboard")
 public class DashboardController extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(DashboardController.class.getName());
     private final TransactionDAO transactionDAO = new TransactionDAO();
 
     @Override
@@ -31,6 +34,7 @@ public class DashboardController extends HttpServlet {
         } catch (RuntimeException exception) {
             response.getWriter().write(JsonUtil.error("Tháng không hợp lệ, định dạng đúng là yyyy-MM"));
         } catch (SQLException exception) {
+            LOGGER.log(Level.SEVERE, "Dashboard database request failed", exception);
             response.getWriter().write(JsonUtil.error("Lỗi database"));
         }
     }
