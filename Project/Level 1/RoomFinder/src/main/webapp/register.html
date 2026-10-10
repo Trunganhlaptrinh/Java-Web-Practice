@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomFinder - Đăng ký</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: "Inter Tight", sans-serif;
+                background:
+                    radial-gradient(circle at top left, rgba(194,153,104,.12), transparent 22%),
+                    radial-gradient(circle at bottom right, rgba(150,110,84,.09), transparent 22%),
+                    linear-gradient(180deg, oklch(96% 0.02 80), oklch(94% 0.018 80));
+                color: #221f1a;
+                min-height: 100vh;
+            }
+            h1,h2,h3,h4 { font-family: "Cormorant Garamond", serif; }
+        }
+        @layer utilities {
+            .glass-smoke { backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+            .btn-primary {
+                display: inline-block;
+                border-radius: 999px;
+                background: linear-gradient(180deg, #5a4a3a, #3d3127);
+                color: #fff;
+                font-weight: 700;
+                box-shadow: 0 4px 16px rgba(60,45,30,.25);
+                transition: transform .3s ease, box-shadow .3s ease;
+            }
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(60,45,30,.35);
+                background: linear-gradient(180deg, #6b5a48, #4a3d30);
+            }
+            .btn-primary:active { transform: scale(0.97); }
+
+            .btn-secondary {
+                display: inline-block;
+                border-radius: 999px;
+                background: rgba(255,255,255,.6);
+                border: 2px solid #8b7355;
+                color: #3d3127;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(60,45,30,.1);
+                transition: transform .3s ease, box-shadow .3s ease;
+            }
+            .btn-secondary:hover {
+                background: rgba(255,255,255,.85);
+                transform: translateY(-2px);
+            }
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+</head>
+<body class="flex flex-col items-center justify-center p-4 sm:p-6 pb-20">
+    <header class="fixed top-0 inset-x-0 z-50 px-3 sm:px-5 py-3 sm:py-5">
+        <div class="mx-auto max-w-[1700px]">
+            <div class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/45 px-4 sm:px-6 py-3 sm:py-4 glass-smoke">
+                <div>
+                    <a href="index.html" class="text-[10px] uppercase tracking-[0.35em] text-[#6b6255] font-bold block">RoomFinder</a>
+                    <div class="mt-1 text-xs sm:text-sm text-[#413a31]">Nơi an cư lý tưởng</div>
+                </div>
+                <a href="login.html" class="btn-primary px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.25em]">Đăng Nhập</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-lg mt-[110px] sm:mt-[120px] mx-auto">
+        <div class="rounded-2xl border border-white/40 bg-white/40 p-8 sm:p-10 glass-smoke shadow-xl">
+            <h2 class="text-4xl text-center text-[#231f19] mb-8">Tạo Tài Khoản</h2>
+            
+            <div id="msg" class="mb-4 text-center text-sm font-semibold hidden"></div>
+            
+            <form id="registerForm" class="space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-[0.2em] text-[#5b5247] mb-2">Tên đăng nhập</label>
+                        <input type="text" id="username" required class="w-full rounded-xl border border-[#d8c1a3]/50 bg-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#8b7355] transition text-[#231f19]">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-[0.2em] text-[#5b5247] mb-2">Mật khẩu</label>
+                        <input type="password" id="password" required class="w-full rounded-xl border border-[#d8c1a3]/50 bg-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#8b7355] transition text-[#231f19]">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] uppercase tracking-[0.2em] text-[#5b5247] mb-2">Họ và tên</label>
+                    <input type="text" id="fullName" required class="w-full rounded-xl border border-[#d8c1a3]/50 bg-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#8b7355] transition text-[#231f19]">
+                </div>
+                <div>
+                    <label class="block text-[11px] uppercase tracking-[0.2em] text-[#5b5247] mb-2">Số điện thoại (Zalo)</label>
+                    <input type="text" id="phone" required class="w-full rounded-xl border border-[#d8c1a3]/50 bg-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#8b7355] transition text-[#231f19]">
+                </div>
+                <div>
+                    <label class="block text-[11px] uppercase tracking-[0.2em] text-[#5b5247] mb-2">Bạn là ai?</label>
+                    <div class="flex gap-6 mt-3">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#3d3127]">
+                            <input type="radio" name="role" value="RENTER" checked class="w-4 h-4 accent-[#5a4a3a]"> Người thuê phòng
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#3d3127]">
+                            <input type="radio" name="role" value="LANDLORD" class="w-4 h-4 accent-[#5a4a3a]"> Chủ nhà
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary w-full py-4 text-[11px] uppercase tracking-[0.25em] mt-6">
+                    Đăng Ký
+                </button>
+            </form>
+            <p class="text-center text-sm text-[#5b5247] mt-6">
+                Đã có tài khoản? <a href="login.html" class="text-[#5a4a3a] font-bold underline hover:text-[#3d3127]">Đăng nhập</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById('msg');
+            msgEl.style.display = 'block';
+            msgEl.textContent = 'Đang xử lý...';
+            msgEl.className = 'mb-4 text-center text-sm font-semibold text-[#5b5247] block';
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            
+            const res = await fetchAPI('/RoomFinder/api/auth/register', 'POST', { username, password, fullName, phone, role });
+            if (res.success) {
+                msgEl.textContent = 'Đăng ký thành công! Đang chuyển hướng...';
+                msgEl.className = 'mb-4 text-center text-sm font-semibold text-green-700 block';
+                setTimeout(() => window.location.href = 'login.html', 1500);
+            } else {
+                msgEl.textContent = res.message;
+                msgEl.className = 'mb-4 text-center text-sm font-semibold text-red-600 block';
+            }
+        });
+    </script>
+</body>
+</html>

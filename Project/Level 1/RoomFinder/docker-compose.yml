@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: roomfinder-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: room_finder
+    ports:
+      - "3308:3306"
+    volumes:
+      - roomfinder_mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: roomfinder-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: room_finder
+      DB_USER: root
+      DB_PASSWORD: root
+    ports:
+      - "1234:8080"
+
+volumes:
+  roomfinder_mysql_data:

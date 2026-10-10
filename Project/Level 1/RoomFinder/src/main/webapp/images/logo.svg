@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" stroke="currentColor">
+  <!-- House base -->
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="28" fill="rgba(194, 153, 104, 0.15)" stroke="#6b6255" d="M256 64L112 192v224h96v-128h96v128h96V192L256 64z"/>
+  
+  <!-- Magnifying glass inside -->
+  <circle cx="256" cy="224" r="40" stroke-width="28" stroke="#413a31" fill="none"/>
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="28" stroke="#413a31" d="M284 252l32 32"/>
+</svg>
+

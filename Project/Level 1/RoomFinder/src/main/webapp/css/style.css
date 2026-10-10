@@ -1,0 +1,195 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+header {
+    background: #007bff;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    position: relative;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.nav-links {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.nav-links a, .nav-links button {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.nav-links button {
+    background: #dc3545;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px 0;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-group .radio-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.form-group .radio-group input {
+    width: auto;
+}
+
+.btn {
+    display: inline-block;
+    background: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: #0056b3;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-success {
+    background: #28a745;
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.room-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.room-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.room-info {
+    padding: 15px;
+}
+
+.room-info h3 {
+    margin-top: 0;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.badge-available { background: #28a745; }
+.badge-negotiating { background: #ffc107; color: #333; }
+.badge-rented { background: #dc3545; }
+
+.badge-pending { background: #ffc107; color: #333; }
+.badge-approved { background: #28a745; }
+.badge-rejected { background: #dc3545; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #f4f4f4;
+}
+
+.hero {
+    text-align: center;
+    padding: 50px 20px;
+    background: #e9ecef;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.error-msg {
+    color: red;
+    margin-bottom: 10px;
+}
+.success-msg {
+    color: green;
+    margin-bottom: 10px;
+}
+

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoomFinder | Nền tảng tìm phòng chuyên nghiệp</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style type="text/tailwindcss">
+        @theme {
+      --color-parchment: oklch(96% 0.02 80);
+      --color-boucle: oklch(93% 0.018 85);
+      --color-oak: oklch(72% 0.05 72);
+      --color-terracotta: oklch(58% 0.09 45);
+      --color-walnut: oklch(22% 0.02 48);
+      --color-smoke: oklch(40% 0.02 50);
+    }
+
+    @layer base {
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter Tight", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(194,153,104,.12), transparent 22%),
+          radial-gradient(circle at bottom right, rgba(150,110,84,.09), transparent 22%),
+          linear-gradient(180deg, oklch(96% 0.02 80), oklch(94% 0.018 80));
+        color: #221f1a;
+        overflow-x: hidden;
+      }
+
+      h1,h2,h3,h4 {
+        font-family: "Cormorant Garamond", serif;
+        letter-spacing: -.05em;
+      }
+    }
+
+    @layer utilities {
+
+      .glass-smoke {
+        backdrop-filter: blur(15px) contrast(.95);
+        -webkit-backdrop-filter: blur(15px) contrast(.95);
+      }
+
+      /* Bold button style - solid dark background */
+      .btn-primary {
+        display: inline-block;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #5a4a3a, #3d3127);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 4px 16px rgba(60,45,30,.25);
+        transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(60,45,30,.35);
+        background: linear-gradient(180deg, #6b5a48, #4a3d30);
+      }
+
+      .btn-primary:active {
+        transform: scale(0.97);
+      }
+
+      /* Secondary button - outlined style */
+      .btn-secondary {
+        display: inline-block;
+        border-radius: 999px;
+        background: rgba(255,255,255,.6);
+        border: 2px solid #8b7355;
+        color: #3d3127;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(60,45,30,.1);
+        transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255,255,255,.85);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(60,45,30,.15);
+      }
+
+      .grain-oak {
+        background-image:
+          linear-gradient(rgba(255,255,255,.02), rgba(255,255,255,.02)),
+          repeating-linear-gradient(
+            90deg,
+            rgba(102,75,48,.05) 0px,
+            rgba(102,75,48,.05) 1px,
+            transparent 1px,
+            transparent 7px
+          );
+      }
+
+      .woven-layer {
+        background-image:
+          linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)),
+          repeating-linear-gradient(
+            0deg,
+            rgba(113,88,58,.04) 0px,
+            rgba(113,88,58,.04) 1px,
+            transparent 1px,
+            transparent 5px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(113,88,58,.04) 0px,
+            rgba(113,88,58,.04) 1px,
+            transparent 1px,
+            transparent 5px
+          );
+      }
+
+      .kinetic-title span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(80px);
+        animation: reveal .8s cubic-bezier(.16,1,.3,1) forwards;
+      }
+
+      .kinetic-title span:nth-child(2) {
+        animation-delay: .08s;
+      }
+
+      .kinetic-title span:nth-child(3) {
+        animation-delay: .16s;
+      }
+
+      .kinetic-title span:nth-child(4) {
+        animation-delay: .24s;
+      }
+
+      .section-rise {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 40%;
+      }
+
+      .macro-track {
+        scrollbar-width: none;
+      }
+
+      .macro-track::-webkit-scrollbar {
+        display: none;
+      }
+
+      @keyframes reveal {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(60px) scale(.98);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes zoomVideo {
+        from {
+          transform: scale(1.02);
+        }
+
+        to {
+          transform: scale(1.12);
+        }
+      }
+
+      .hero-video {
+        animation:
+          zoomVideo linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  </style>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Background decoration -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute left-[5%] top-[10%] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(201,161,113,.12),transparent_70%)] blur-3xl"></div>
+        <div class="absolute bottom-[0%] right-[8%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(150,103,78,.12),transparent_70%)] blur-3xl"></div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="fixed top-0 inset-x-0 z-50 px-3 sm:px-5 py-3 sm:py-5">
+        <div class="mx-auto max-w-[1700px]">
+            <div class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/45 px-4 sm:px-6 py-3 sm:py-4 glass-smoke">
+                <div>
+                    <div class="text-[10px] uppercase tracking-[0.35em] text-[#6b6255]">RoomFinder</div>
+                    <div class="mt-1 text-xs sm:text-sm text-[#413a31]">Nơi an cư lý tưởng</div>
+                </div>
+
+                <nav class="hidden lg:flex items-center gap-10 text-[11px] uppercase tracking-[0.25em] text-[#5b5247]">
+                    <a href="#collection" class="hover:opacity-60 transition">Lựa Chọn</a>
+                    <a href="#materials" class="hover:opacity-60 transition">Tiện Ích</a>
+                    <a href="#residence" class="hover:opacity-60 transition">Cam Kết</a>
+                </nav>
+
+                <a href="login.html" class="btn-primary px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-center">
+                    Vào Hệ Thống
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[90px] sm:pt-[110px]">
+
+        <!-- ===== HERO SECTION ===== -->
+        <section class="relative min-h-[80vh] sm:min-h-screen overflow-hidden">
+            <div class="mx-auto grid min-h-[80vh] sm:min-h-screen max-w-[1700px] grid-cols-1 xl:grid-cols-[.42fr_.58fr]">
+
+                <!-- Text side -->
+                <div class="relative z-20 flex items-center px-6 sm:px-8 py-12 sm:py-20 xl:px-20">
+                    <div class="max-w-2xl">
+                        <h1 data-aos="zoom-in" class="kinetic-title text-[clamp(3rem,8vw,8rem)] leading-[0.88] text-[#231f19]">
+                            <span>Tìm Phòng</span><br>
+                            <span>Nhanh</span><br>
+                            <span>Chóng</span>
+                        </h1>
+
+                        <p class="glass-smoke mt-8 sm:mt-10 max-w-xl rounded-2xl bg-white/35 p-5 sm:p-7 text-base sm:text-lg leading-7 sm:leading-9 text-[#4a4339]">
+                            Nền tảng kết nối Người cho thuê và Người cần thuê phòng trọ an toàn, minh bạch với hàng ngàn không gian sống lý tưởng.
+                        </p>
+
+                        <div class="mt-8 sm:mt-10 flex flex-wrap gap-4">
+                            <a href="register.html" class="btn-primary px-6 sm:px-8 py-4 sm:py-5 text-[11px] uppercase tracking-[0.25em]">
+                                Đăng Ký Ngay
+                            </a>
+                            <a href="login.html" class="btn-secondary px-6 sm:px-8 py-4 sm:py-5 text-[11px] uppercase tracking-[0.25em]">
+                                Đăng Nhập
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image side -->
+                <div class="relative flex items-center justify-center overflow-hidden px-4 py-6 xl:px-10">
+                    <div class="relative w-full h-[300px] sm:h-[400px] xl:h-full rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1920&q=80"
+                             alt="Căn hộ hiện đại" loading="lazy"
+                             class="hero-video absolute inset-0 h-full w-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===== COLLECTION SECTION ===== -->
+        <section id="collection" class="grain-oak relative overflow-hidden px-4 sm:px-6 py-16 sm:py-28">
+            <div class="mx-auto max-w-[1700px]">
+
+                <div data-aos="fade-up" class="mb-12 sm:mb-16 max-w-4xl">
+                    <div class="text-[10px] uppercase tracking-[0.35em] text-[#7a6b5c]">Sự đa dạng không gian</div>
+                    <h2 class="mt-5 text-[clamp(2.2rem,6vw,5.8rem)] leading-[0.9] text-[#241f19]">
+                        Hàng ngàn phòng trọ và căn hộ phù hợp mọi nhu cầu.
+                    </h2>
+                </div>
+
+                <!-- Cards grid - consistent rectangular cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+
+                    <!-- Card 1: Căn hộ Studio -->
+                    <article data-aos="fade-up" data-aos-delay="0" class="group rounded-2xl overflow-hidden bg-white/50 backdrop-blur-2xl shadow-sm hover:shadow-xl transition-shadow duration-500">
+                        <div class="h-[16rem] sm:h-[20rem] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
+                                 alt="Căn hộ Studio đầy đủ tiện nghi" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="px-5 py-5">
+                            <div class="text-[10px] uppercase tracking-[0.3em] text-[#7b6d5b]">Đầy đủ tiện nghi</div>
+                            <h3 class="mt-3 text-3xl sm:text-4xl text-[#231f19]">Căn Hộ Studio</h3>
+                        </div>
+                    </article>
+
+                    <!-- Card 2: Nhà Nguyên Căn -->
+                    <article data-aos="fade-up" data-aos-delay="100" class="group rounded-2xl overflow-hidden bg-[#e4d4bf]/70 shadow-sm hover:shadow-xl transition-shadow duration-500">
+                        <div class="h-[16rem] sm:h-[20rem] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"
+                                 alt="Nhà nguyên căn rộng rãi" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="px-5 py-5">
+                            <div class="text-[10px] uppercase tracking-[0.3em] text-[#5e4c39]">Sức chứa lớn</div>
+                            <h3 class="mt-3 text-3xl sm:text-4xl text-[#2a241c]">Nhà Nguyên Căn</h3>
+                        </div>
+                    </article>
+
+                    <!-- Card 3: Phòng Trọ Sinh Viên -->
+                    <article data-aos="fade-up" data-aos-delay="200" class="group rounded-2xl overflow-hidden bg-white/40 backdrop-blur-2xl shadow-sm hover:shadow-xl transition-shadow duration-500">
+                        <div class="h-[16rem] sm:h-[20rem] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80"
+                                 alt="Phòng trọ sinh viên giá rẻ" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="px-5 py-5">
+                            <div class="text-[10px] uppercase tracking-[0.3em] text-[#7b6d5b]">Giá cả hợp lý</div>
+                            <h3 class="mt-3 text-3xl sm:text-4xl text-[#231f19]">Phòng Trọ Sinh Viên</h3>
+                        </div>
+                    </article>
+
+                    <!-- Card 4: Căn Hộ Dịch Vụ -->
+                    <article data-aos="fade-up" data-aos-delay="300" class="group rounded-2xl overflow-hidden bg-white/50 backdrop-blur-2xl shadow-sm hover:shadow-xl transition-shadow duration-500 sm:col-span-2 xl:col-span-1">
+                        <div class="h-[16rem] sm:h-[20rem] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80"
+                                 alt="Căn hộ dịch vụ cao cấp" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="px-5 py-5">
+                            <div class="text-[10px] uppercase tracking-[0.3em] text-[#7b6d5b]">Sang trọng & Khép kín</div>
+                            <h3 class="mt-3 text-3xl sm:text-4xl text-[#231f19]">Căn Hộ Dịch Vụ</h3>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===== FEATURES SECTION ===== -->
+        <section id="materials" class="woven-layer relative overflow-hidden py-16 sm:py-28">
+            <div class="mx-auto max-w-[1700px]">
+
+                <div data-aos="fade-up" class="px-4 sm:px-6">
+                    <div class="text-[10px] uppercase tracking-[0.35em] text-[#7a6b5c]">Trải nghiệm mượt mà</div>
+                    <h2 class="mt-5 max-w-5xl text-[clamp(2.2rem,6vw,6rem)] leading-[0.92] text-[#241f19]">
+                        Giao diện trực quan giúp bạn dễ dàng đăng tin và tìm kiếm phòng.
+                    </h2>
+                </div>
+
+                <!-- Feature cards - consistent grid -->
+                <div class="mt-12 sm:mt-20 grid grid-cols-1 md:grid-cols-2 gap-6 px-4 sm:px-6">
+
+                    <!-- Feature 1: Tìm Kiếm Thông Minh -->
+                    <article data-aos="fade-up" class="group rounded-2xl overflow-hidden bg-[#f4ece2]/70 backdrop-blur-2xl shadow-sm hover:shadow-xl transition-shadow duration-500">
+                        <div class="h-[16rem] sm:h-[22rem] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=800&q=80"
+                                 alt="Tìm kiếm phòng thông minh" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="px-5 py-5">
+                            <div class="text-[10px] uppercase tracking-[0.3em] text-[#776858]">Tính năng</div>
+                            <h3 class="mt-3 text-3xl sm:text-4xl text-[#251f19]">Tìm Kiếm Thông Minh</h3>
+                        </div>
+                    </article>
+
+                    <!-- Feature 2: Quản Lý Dễ Dàng -->
+                    <article data-aos="fade-up" data-aos-delay="100" class="group rounded-2xl overflow-hidden bg-[#d7c0a3]/40 shadow-sm hover:shadow-xl transition-shadow duration-500">
+                        <div class="h-[16rem] sm:h-[22rem] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80"
+                                 alt="Quản lý phòng dễ dàng" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                        <div class="px-5 py-5">
+                            <div class="text-[10px] uppercase tracking-[0.3em] text-[#6d5c49]">Tính năng</div>
+                            <h3 class="mt-3 text-3xl sm:text-4xl text-[#231f19]">Quản Lý Dễ Dàng</h3>
+                            <p class="mt-3 text-sm sm:text-base leading-7 text-[#4f473e]">
+                                Hệ thống Dashboard dành riêng cho chủ nhà, giúp đăng tải, chỉnh sửa và theo dõi các yêu cầu đàm phán một cách hiệu quả.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===== GALLERY SECTION ===== -->
+        <section id="gallery" class="py-12 sm:py-20 px-4 sm:px-6 overflow-hidden">
+            <div class="mx-auto max-w-[1700px]">
+                <div class="text-[10px] uppercase tracking-[0.35em] text-[#7a6b5c] mb-8 sm:mb-12 text-center" data-aos="fade-up">
+                    Không gian sống đa dạng
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="overflow-hidden rounded-2xl h-40 sm:h-48 md:h-64" data-aos="zoom-in" data-aos-delay="0">
+                        <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=600&q=80"
+                             loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Phòng khách ấm cúng">
+                    </div>
+                    <div class="overflow-hidden rounded-2xl h-40 sm:h-48 md:h-64" data-aos="zoom-in" data-aos-delay="100">
+                        <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=600&q=80"
+                             loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Phòng ngủ hiện đại">
+                    </div>
+                    <div class="overflow-hidden rounded-2xl h-40 sm:h-48 md:h-64" data-aos="zoom-in" data-aos-delay="200">
+                        <img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=600&q=80"
+                             loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Không gian sống sang trọng">
+                    </div>
+                    <div class="overflow-hidden rounded-2xl h-40 sm:h-48 md:h-64" data-aos="zoom-in" data-aos-delay="300">
+                        <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80"
+                             loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Phòng làm việc tại gia">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== COMMITMENT SECTION ===== -->
+        <section id="residence" class="relative overflow-hidden bg-[#241c18] px-4 sm:px-6 py-16 sm:py-28 text-white">
+
+            <div class="absolute inset-0 opacity-[0.12]">
+                <div class="h-full w-full bg-[repeating-linear-gradient(90deg,rgba(255,255,255,.08)_0px,rgba(255,255,255,.08)_1px,transparent_1px,transparent_8px)]"></div>
+            </div>
+
+            <div class="absolute left-[8%] top-[20%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(201,161,113,.14),transparent_72%)] blur-3xl"></div>
+
+            <div class="relative mx-auto max-w-[1700px]">
+
+                <div class="grid gap-10 sm:gap-16 xl:grid-cols-[1fr_.55fr]">
+
+                    <div data-aos="fade-up">
+                        <div class="text-[10px] uppercase tracking-[0.35em] text-white/40">Cam kết chất lượng</div>
+                        <h2 class="mt-6 max-w-4xl text-[clamp(2.2rem,6vw,6rem)] leading-[0.9] text-white">
+                            RoomFinder mang lại sự an tâm tuyệt đối trong quá trình đàm phán và thuê phòng.
+                        </h2>
+                    </div>
+
+                    <div data-aos="fade-up" class="flex flex-col justify-end">
+                        <div class="rounded-2xl bg-white/[0.04] p-6 sm:p-8 backdrop-blur-2xl">
+                            <div class="space-y-5 text-sm uppercase tracking-[0.25em] text-white/55">
+                                <div class="flex items-center justify-between">
+                                    <span>Thông tin xác thực</span><span>01</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Liên hệ trực tiếp</span><span>02</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Hoàn toàn miễn phí</span><span>03</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Hỗ trợ tận tình</span><span>04</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mt-16 sm:mt-24 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/10 pt-8">
+                    <div>
+                        <div class="text-[10px] uppercase tracking-[0.35em] text-white/40">RoomFinder</div>
+                        <div class="mt-2 text-white/70">Kết nối an cư, dựng xây tổ ấm</div>
+                    </div>
+
+                    <a href="register.html" class="btn-primary bg-gradient-to-b from-white/90 to-white/80 !text-[#2b241d] px-6 sm:px-8 py-4 sm:py-5 text-[11px] uppercase tracking-[0.25em] shadow-lg hover:shadow-xl">
+                        Tham Gia Ngay
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getCurrentUser();
+            if (user) {
+                if (user.role === 'RENTER') {
+                    window.location.href = 'renter-dashboard.html';
+                } else if (user.role === 'LANDLORD') {
+                    window.location.href = 'landlord-dashboard.html';
+                }
+            }
+        });
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init({duration: 800, once: true});</script>
+</body>
+
+</html>

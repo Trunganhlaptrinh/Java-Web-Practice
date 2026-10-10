@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomFinder - Người thuê phòng</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: "Inter Tight", sans-serif;
+                background:
+                    radial-gradient(circle at top left, rgba(194,153,104,.12), transparent 22%),
+                    radial-gradient(circle at bottom right, rgba(150,110,84,.09), transparent 22%),
+                    linear-gradient(180deg, oklch(96% 0.02 80), oklch(94% 0.018 80));
+                color: #221f1a;
+                min-height: 100vh;
+            }
+            h1,h2,h3,h4 { font-family: "Cormorant Garamond", serif; }
+        }
+        @layer utilities {
+            .glass-smoke { backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+            .btn-primary {
+                display: inline-block;
+                border-radius: 999px;
+                background: linear-gradient(180deg, #5a4a3a, #3d3127);
+                color: #fff;
+                font-weight: 700;
+                box-shadow: 0 4px 16px rgba(60,45,30,.25);
+                transition: transform .3s ease, box-shadow .3s ease;
+            }
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(60,45,30,.35);
+            }
+            .btn-primary:active { transform: scale(0.97); }
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+</head>
+<body class="p-3 sm:p-6">
+    <header class="fixed top-0 inset-x-0 z-50 px-3 sm:px-5 py-3 sm:py-5">
+        <div class="mx-auto max-w-[1700px]">
+            <div class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/45 px-4 sm:px-6 py-3 sm:py-4 glass-smoke">
+                <div>
+                    <a href="index.html" class="text-[10px] uppercase tracking-[0.35em] text-[#6b6255] font-bold block">RoomFinder</a>
+                    <div class="mt-1 text-xs sm:text-sm text-[#413a31]">Dành cho người thuê</div>
+                </div>
+                <div id="nav-links" class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm font-semibold text-[#5b5247]">
+                    <!-- Render by JS -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-[1400px] mt-[100px] sm:mt-[120px] pb-20">
+        
+        <!-- Yêu cầu thuê phòng -->
+        <div class="mb-10 sm:mb-12">
+            <h2 class="text-3xl sm:text-4xl text-[#231f19] mb-6">Yêu cầu thuê phòng của bạn</h2>
+            <div class="rounded-2xl border border-white/40 bg-white/40 p-4 sm:p-8 glass-smoke shadow-sm overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="requestsTable">
+                    <thead>
+                        <tr class="text-[11px] uppercase tracking-[0.15em] text-[#7a6b5c] border-b border-[#d8c1a3]/50">
+                            <th class="py-4 font-semibold">Tên phòng</th>
+                            <th class="py-4 font-semibold">Trạng thái</th>
+                            <th class="py-4 font-semibold">Liên hệ chủ nhà</th>
+                            <th class="py-4 font-semibold">Ngày gửi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <!-- Load by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Danh sách phòng -->
+        <div>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h2 class="text-3xl sm:text-4xl text-[#231f19]">Danh sách phòng</h2>
+                <div class="flex gap-2 w-full md:w-auto md:min-w-[320px]">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm theo tiêu đề hoặc địa chỉ..."
+                           class="flex-1 rounded-xl border border-[#d8c1a3]/50 bg-white/60 px-4 sm:px-5 py-3 focus:outline-none focus:ring-2 focus:ring-[#8b7355] transition text-sm text-[#231f19]">
+                    <button class="btn-primary px-5 sm:px-6 py-3 text-[11px] uppercase tracking-[0.2em]" onclick="loadRooms()">Tìm</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="roomGrid">
+                <!-- Load by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'RENTER') {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('nav-links').innerHTML = `
+                <span class="text-xs sm:text-sm">Xin chào, ${user.fullName}</span>
+                <button onclick="logout()" class="rounded-full px-4 sm:px-5 py-2 text-[10px] uppercase tracking-[0.1em] bg-red-600 text-white font-bold hover:bg-red-700 transition">Đăng xuất</button>
+            `;
+
+            loadRooms();
+            loadRequests();
+        });
+
+        async function loadRooms() {
+            const search = document.getElementById('searchInput').value;
+            const res = await fetchAPI(`/RoomFinder/api/rooms?search=${encodeURIComponent(search)}`);
+            const grid = document.getElementById('roomGrid');
+            grid.innerHTML = '';
+            
+            if (res.success && res.data.length > 0) {
+                res.data.forEach(room => {
+                    let badgeClass = 'bg-gray-200 text-gray-700';
+                    let statusText = room.status;
+                    if (room.status === 'AVAILABLE') { badgeClass = 'bg-green-100 text-green-800'; statusText = 'CÒN TRỐNG'; }
+                    else if (room.status === 'NEGOTIATING') { badgeClass = 'bg-yellow-100 text-yellow-800'; statusText = 'ĐANG ĐÀM PHÁN'; }
+                    else if (room.status === 'RENTED') { badgeClass = 'bg-red-100 text-red-800'; statusText = 'ĐÃ CHO THUÊ'; }
+                    
+                    grid.innerHTML += `
+                        <div class="rounded-2xl border border-white/40 bg-white/45 p-4 sm:p-5 glass-smoke flex flex-col transition hover:shadow-lg">
+                            <img src="${room.imageUrl}" alt="${room.title}" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" class="w-full h-44 sm:h-48 object-cover rounded-xl mb-4">
+                            <h3 class="text-xl sm:text-2xl text-[#231f19] mb-2 font-semibold">${room.title}</h3>
+                            <p class="text-sm text-[#4a4339] mb-1"><strong>Giá:</strong> ${formatCurrency(room.price)}/tháng</p>
+                            <p class="text-sm text-[#4a4339] mb-1"><strong>Diện tích:</strong> ${room.area} m²</p>
+                            <p class="text-sm text-[#4a4339] mb-4"><strong>Địa chỉ:</strong> ${room.address}</p>
+                            <div class="mt-auto flex justify-between items-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeClass}">${statusText}</span>
+                                ${room.status === 'AVAILABLE' ? `<button class="btn-primary px-4 sm:px-5 py-2.5 text-[10px] uppercase tracking-[0.1em]" onclick="requestRoom(${room.id})">Gửi Yêu Cầu</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                grid.innerHTML = '<p class="text-[#4a4339]">Không tìm thấy phòng nào.</p>';
+            }
+        }
+
+        async function loadRequests() {
+            const res = await fetchAPI('/RoomFinder/api/requests');
+            const tbody = document.querySelector('#requestsTable tbody');
+            tbody.innerHTML = '';
+            
+            if (res.success && res.data.length > 0) {
+                res.data.forEach(req => {
+                    let badgeClass = 'bg-gray-100 text-gray-700';
+                    let statusText = req.status;
+                    if (req.status === 'APPROVED') { badgeClass = 'bg-green-100 text-green-800'; statusText = 'ĐÃ DUYỆT'; }
+                    else if (req.status === 'REJECTED') { badgeClass = 'bg-red-100 text-red-800'; statusText = 'TỪ CHỐI'; }
+                    else if (req.status === 'PENDING') { badgeClass = 'bg-yellow-100 text-yellow-800'; statusText = 'ĐANG CHỜ'; }
+                    
+                    tbody.innerHTML += `
+                        <tr class="border-b border-white/40 last:border-0">
+                            <td class="py-4 text-[#4a4339]">${req.roomTitle}</td>
+                            <td class="py-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${badgeClass}">${statusText}</span></td>
+                            <td class="py-4 text-[#4a4339] font-bold">${req.status === 'APPROVED' ? 'Chủ nhà sẽ liên hệ qua Zalo/SĐT' : '-'}</td>
+                            <td class="py-4 text-[#4a4339]">${new Date(req.createdAt).toLocaleString('vi-VN')}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-[#4a4339]">Bạn chưa gửi yêu cầu thuê nào.</td></tr>';
+            }
+        }
+
+        async function requestRoom(roomId) {
+            if (confirm('Bạn có chắc chắn muốn gửi yêu cầu thuê phòng này?')) {
+                const res = await fetchAPI('/RoomFinder/api/requests', 'POST', { roomId: roomId, message: 'Tôi muốn thuê phòng này' });
+                if (res.success) {
+                    alert('Gửi yêu cầu thành công!');
+                    loadRequests();
+                } else {
+                    alert(res.message);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
