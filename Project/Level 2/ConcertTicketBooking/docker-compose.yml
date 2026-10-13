@@ -4,7 +4,7 @@ services:
     container_name: ctb-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - ctb_mongo_data:/data/db
     healthcheck:

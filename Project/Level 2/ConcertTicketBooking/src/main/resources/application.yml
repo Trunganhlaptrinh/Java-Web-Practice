@@ -7,7 +7,7 @@ spring:
   data:
     mongodb:
       # MongoDB Atlas URI (dung khi mang mo port 27017 hoac deploy):
-      # mongodb+srv://trunganhlaptrinh_db_user:123456%40@cluster0.gdbtdsz.mongodb.net/concert_booking?retryWrites=true&w=majority&appName=Cluster0
+      # mongodb+srv://<username>:<password>@cluster0.example.mongodb.net/concert_booking?retryWrites=true&w=majority
       # MongoDB Local tren Docker:
       uri: ${MONGODB_URI:mongodb://localhost:27017/concert_booking}
       auto-index-creation: true
