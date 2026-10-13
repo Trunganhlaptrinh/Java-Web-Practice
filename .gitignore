@@ -1,11 +1,46 @@
-/JW-L2/dist/
-/JW-L3/nbproject/private/
-/JW-L3/build/
-/Code-Practice/JW-L4-First-CRUD-Core/nbproject/private/
-/Project/Level 1/Student-Management-uplevel/StudentManagementUplevel/nbproject/private/
-/Project/Level 1/StudentManagementUplevel/nbproject/private/
-/Code-Practice/JW-L4-First-CRUD-Core/build/
-/Project/Level 1/StudentManagementUplevel/target/
-/Project/Level 1/Personal-Expense-Manager/target/
-Project/Level 1/RoomFinder/target/
+# Build Outputs
+target/
+**/target/
+build/
+**/build/
+dist/
+**/dist/
+out/
+**/out/
+*.class
+*.jar
+*.war
 
+# NetBeans
+nbproject/private/
+**/nbproject/private/
+
+# IntelliJ IDEA
+.idea/
+**/.idea/
+*.iml
+**/*.iml
+
+# VS Code & Eclipse
+.vscode/
+**/.vscode/
+.settings/
+**/.settings/
+.project
+**/.project
+.classpath
+**/.classpath
+
+# Logs & Temp files
+*.log
+logs/
+**/logs/
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets & Environment variables
+.env
+*.env.local
