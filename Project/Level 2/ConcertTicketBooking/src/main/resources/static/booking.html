@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE SHOW - Chọn Ghế & Đặt Vé</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/index.html" class="brand">
+            <img src="/images/logo-the-show.png" alt="THE SHOW" style="height: 38px; width: auto; object-fit: contain;">
+            <span class="brand-name">THE SHOW</span>
+        </a>
+        <div class="nav-actions" id="nav-actions"></div>
+    </nav>
+
+    <div class="container">
+        <!-- Concert Switcher Bar -->
+        <div style="background: #FFFFFF; padding: 16px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 12px; flex: 1; max-width: 600px;">
+                <label for="concert-select" style="font-size: 13px; font-weight: 800; color: #111827; letter-spacing: 0.5px; white-space: nowrap;">CHỌN SỰ KIỆN:</label>
+                <select id="concert-select" class="form-input" style="font-weight: 700; padding: 8px 14px;" onchange="switchConcert(this.value)">
+                    <option value="">Đang tải danh sách sự kiện...</option>
+                </select>
+            </div>
+            <div style="font-size: 12px; font-weight: 700; color: #000000; border: 1px solid #000000; padding: 4px 14px; border-radius: var(--radius-full);">
+                VÉ CHÍNH HÃNG 100%
+            </div>
+        </div>
+
+        <!-- Event Header Banner -->
+        <div style="background: #FFFFFF; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <img id="event-poster" src="/images/AnhTraiSayHi2_logo.jpg" alt="Poster" style="width: 120px; height: 80px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-light);" onerror="this.style.display='none'">
+                <div>
+                    <h1 id="event-title" style="font-size: 24px; font-weight: 900; margin-bottom: 6px; color: #000000;">Đang tải thông tin sự kiện...</h1>
+                    <p id="event-details" style="color: var(--text-muted); font-size: 14px;"></p>
+                </div>
+            </div>
+            <div>
+                <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid #000000; padding: 6px 14px; border-radius: var(--radius-full);">SƠ ĐỒ TRỰC QUAN</span>
+            </div>
+        </div>
+
+        <div class="booking-layout">
+            <!-- Left: Interactive Visual Seat Map -->
+            <div class="seat-map-wrapper">
+                <div class="stage-container">
+                    <div class="stage">SÂN KHẤU CHÍNH (MAIN STAGE)</div>
+                </div>
+
+                <!-- Tiers Legend -->
+                <div class="legend-bar" id="tier-legend"></div>
+
+                <div class="legend-bar" style="background: transparent; border: none; margin-bottom: 12px;">
+                    <div class="legend-item"><div class="seat-dot" style="background: #FFFFFF; border: 1px solid #000000;"></div> Còn trống</div>
+                    <div class="legend-item"><div class="seat-dot" style="background: #000000;"></div> Đang chọn</div>
+                    <div class="legend-item"><div class="seat-dot" style="background: #D97706;"></div> Đang giữ chỗ (10p)</div>
+                    <div class="legend-item"><div class="seat-dot" style="background: #E5E7EB; border: 1px solid #D1D5DB;"></div> Đã bán</div>
+                </div>
+
+                <!-- Interactive Seat Grid -->
+                <div class="seat-grid" id="seat-grid">
+                    <div style="padding: 40px; color: var(--text-muted); font-size: 14px;">Đang tải sơ đồ ghế...</div>
+                </div>
+            </div>
+
+            <!-- Right: Checkout Sidebar -->
+            <div class="checkout-card">
+                <div class="card-title">
+                    <span>Thông Tin Đặt Vé</span>
+                    <span id="selected-count-badge" style="font-size: 12px; font-weight: 700; border: 1px solid #000000; padding: 2px 10px; border-radius: var(--radius-full);">0/4 ghế</span>
+                </div>
+
+                <!-- Hold Countdown Timer -->
+                <div class="countdown-box" id="hold-countdown-box" style="display: none;">
+                    <div>
+                        <div class="countdown-title">THỜI GIAN GIỮ CHỖ CÒN LẠI</div>
+                        <div style="font-size: 11px; color: #9CA3AF; margin-top: 2px;">Quá hạn ghế sẽ tự động giải phóng</div>
+                    </div>
+                    <div class="countdown-timer" id="countdown-timer">10:00</div>
+                </div>
+
+                <div class="selected-seats-list" id="selected-seats-list">
+                    <p style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 24px 0;">Chưa chọn ghế nào. Vui lòng bấm vào sơ đồ ghế bên trái (tối đa 4 ghế).</p>
+                </div>
+
+                <!-- Step 1: Hold Button -->
+                <button class="btn btn-primary" id="btn-hold-seats" style="width: 100%; margin-bottom: 16px;" onclick="handleHoldSeats()">
+                    GIỮ CHỖ NGAY (10 PHÚT)
+                </button>
+
+                <!-- Step 2: Payment Section -->
+                <div id="payment-section" style="display: none;">
+                    <div class="voucher-input-group">
+                        <input type="text" class="form-input" id="voucher-code" placeholder="Mã giảm giá (ví dụ: VIP50K hoặc ANHTRAI10)" style="text-transform: uppercase;" onkeydown="if(event.key==='Enter'){event.preventDefault();handleApplyVoucher();}">
+                        <button class="btn btn-secondary btn-sm" onclick="handleApplyVoucher()" id="btn-apply-voucher">Áp dụng</button>
+                    </div>
+
+                    <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); padding: 16px; border-radius: var(--radius-md); margin-bottom: 16px;">
+                        <div class="bill-row">
+                            <span>Tạm tính:</span>
+                            <span id="bill-subtotal" style="font-weight: 700;">0 ₫</span>
+                        </div>
+                        <div class="bill-row" style="color: var(--color-success);">
+                            <span>Giảm giá:</span>
+                            <span id="bill-discount" style="font-weight: 700;">-0 ₫</span>
+                        </div>
+                        <div class="bill-row bill-total">
+                            <span>Tổng thanh toán:</span>
+                            <span id="bill-final">0 ₫</span>
+                        </div>
+                    </div>
+
+                    <!-- LỰA CHỌN PHƯƠNG THỨC THANH TOÁN (CÁC NGÂN HÀNG, THẺ, VÍ) -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 13px; font-weight: 800; color: #000000; margin-bottom: 10px; display: block; letter-spacing: 0.5px;">CHỌN PHƯƠNG THỨC THANH TOÁN:</label>
+                        <div style="display: flex; flex-direction: column; gap: 8px;" id="payment-methods-list">
+                            <!-- Option 1: Chuyển khoản ngân hàng (VietQR) -->
+                            <label class="pay-method-option" style="border: 2px solid #000000; background: #FFFFFF; border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="radio" name="payment-method-choice" value="BANK_TRANSFER" checked style="accent-color: #000000; width: 16px; height: 16px;">
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 800; color: #000000;">Chuyển khoản Ngân hàng</div>
+                                        <div style="font-size: 11px; color: #6B7280;">VIB, Vietcombank, Techcombank, MB, BIDV, ACB,...</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Option 2: Thẻ ATM Nội địa / Internet Banking -->
+                            <label class="pay-method-option" style="border: 1px solid var(--border-light); background: #FFFFFF; border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="radio" name="payment-method-choice" value="DOMESTIC_ATM" style="accent-color: #000000; width: 16px; height: 16px;">
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 800; color: #000000;">Thẻ ATM Nội địa / Internet Banking</div>
+                                        <div style="font-size: 11px; color: #6B7280;">Hỗ trợ hơn 40 ngân hàng nội địa Việt Nam</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Option 3: Thẻ quốc tế Visa/MasterCard -->
+                            <label class="pay-method-option" style="border: 1px solid var(--border-light); background: #FFFFFF; border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="radio" name="payment-method-choice" value="CREDIT_CARD" style="accent-color: #000000; width: 16px; height: 16px;">
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 800; color: #000000;">Thẻ Quốc tế (Visa / MasterCard / JCB)</div>
+                                        <div style="font-size: 11px; color: #6B7280;">Bảo mật chuẩn thanh toán 3D-Secure</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Option 4: Ví điện tử -->
+                            <label class="pay-method-option" style="border: 1px solid var(--border-light); background: #FFFFFF; border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="radio" name="payment-method-choice" value="E_WALLET" style="accent-color: #000000; width: 16px; height: 16px;">
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 800; color: #000000;">Ví điện tử (MoMo / ZaloPay / VNPay)</div>
+                                        <div style="font-size: 11px; color: #6B7280;">Quét mã hoặc liên kết ví thanh toán tức thì</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Nút Mở Popup Thanh toán Demo -->
+                    <button class="btn btn-primary btn-lg" id="btn-pay" style="width: 100%; font-weight: 800; letter-spacing: 0.5px; background: #000000; color: #FFFFFF;" onclick="openPaymentDemoModal()">
+                        TIẾN HÀNH THANH TOÁN
+                    </button>
+                </div></div>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    <!-- POPUP DEMO THANH TOÁN (MÔ PHỎNG THÀNH CÔNG / THẤT BẠI) -->
+    <div id="payment-demo-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: #FFFFFF; border: 2px solid #000000; border-radius: 14px; max-width: 480px; width: 100%; padding: 28px 24px 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); text-align: center; position: relative;">
+            <button type="button" onclick="closePaymentDemoModal()" style="position: absolute; top: 14px; right: 18px; background: none; border: none; font-size: 20px; font-weight: 800; cursor: pointer; color: #6B7280; padding: 4px;">✕</button>
+
+            <!-- Header -->
+            <div style="font-size: 11px; font-weight: 800; color: #6B7280; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">CỔNG THANH TOÁN THỬ NGHIỆM (DEMO)</div>
+            <h3 style="font-size: 18px; font-weight: 900; color: #000000; margin: 0 0 18px; text-transform: uppercase; letter-spacing: 0.5px;">XÁC THỰC THANH TOÁN ĐƠN HÀNG</h3>
+
+            <!-- Bill Summary in Modal: CENTERED as requested -->
+            <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px 20px; text-align: center; font-size: 13px; margin-bottom: 18px;">
+                <div style="margin-bottom: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px;">Mã đơn:</div>
+                    <div id="demo-modal-booking-code" style="font-size: 14px; font-weight: 800; color: #000000; font-family: monospace; margin-top: 2px;">BKG...</div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px;">Phương thức:</div>
+                    <div id="demo-modal-method-name" style="font-size: 14px; font-weight: 800; color: #000000; margin-top: 2px;">Chuyển khoản Ngân hàng</div>
+                </div>
+                <div style="border-top: 1px dashed #D1D5DB; padding-top: 10px; margin-top: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px;">Tổng tiền:</div>
+                    <div id="demo-modal-amount" style="font-size: 20px; font-weight: 900; color: #000000; margin-top: 2px;">0 ₫</div>
+                </div>
+            </div>
+
+            <!-- Main Interactive State -->
+            <div id="demo-modal-body-action">
+                <!-- Explicit Demo / Simulation Notice Banner -->
+                <div style="background: #F9FAFB; border: 1.5px dashed #000000; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; text-align: center;">
+                    <div style="font-size: 12px; font-weight: 900; color: #000000; letter-spacing: 0.5px;">ĐÂY CHỈ LÀ DEMO MÔ PHỎNG THỬ NGHIỆM</div>
+                    <div style="font-size: 11px; color: #4B5563; margin-top: 3px; line-height: 1.4;">
+                        Hoàn toàn không trừ tiền thật. Vui lòng chọn kết quả bên dưới để kiểm tra phản hồi hệ thống:
+                    </div>
+                </div>
+
+                <!-- 2 Options: Left = Thành công, Right = Thất bại (Outline buttons, NOT filled giant blocks) -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <!-- Nút bên Trái: THANH TOÁN THÀNH CÔNG -->
+                    <button type="button" id="btn-demo-success" style="background: #FFFFFF; color: #000000; border: 1.5px solid #000000; padding: 13px 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; line-height: 1.3;" onclick="handleDemoPaymentResult(true)" onmouseover="this.style.background='#000000'; this.style.color='#FFFFFF';" onmouseout="this.style.background='#FFFFFF'; this.style.color='#000000';">
+                        THANH TOÁN THÀNH CÔNG<br><span style="font-size: 10px; font-weight: 600; opacity: 0.7;">(CẤP VÉ)</span>
+                    </button>
+                    <!-- Nút bên Phải: THANH TOÁN THẤT BẠI -->
+                    <button type="button" id="btn-demo-failure" style="background: #FFFFFF; color: #DC2626; border: 1.5px solid #DC2626; padding: 13px 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; line-height: 1.3;" onclick="handleDemoPaymentResult(false)" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='#FFFFFF';">
+                        THANH TOÁN THẤT BẠI<br><span style="font-size: 10px; font-weight: 600; opacity: 0.8;">(MÔ PHỎNG)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result State (Shown after selection) -->
+            <div id="demo-modal-body-result" style="display: none; padding-top: 8px;">
+                <div id="demo-result-icon-box" style="margin-bottom: 12px;"></div>
+                <h4 id="demo-result-title" style="font-size: 16px; font-weight: 900; margin: 0 0 6px;"></h4>
+                <p id="demo-result-desc" style="font-size: 12px; color: #4B5563; line-height: 1.5; margin: 0 0 18px;"></p>
+                
+                <div id="demo-result-actions" style="display: flex; gap: 10px; justify-content: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let concertId = urlParams.get('id');
+
+        let allConcerts = [];
+        let concertData = null;
+        let allSeats = [];
+        let selectedSeatIds = new Set();
+        let currentBooking = null;
+        let countdownInterval = null;
+
+        async function init() {
+            try {
+                // 1. Load all concerts for switcher dropdown
+                const listRes = await apiFetch('/concerts');
+                allConcerts = listRes.data || [];
+
+                const selectEl = document.getElementById('concert-select');
+                if (allConcerts.length > 0) {
+                    selectEl.innerHTML = allConcerts.map(c => 
+                        `<option value="${c.id}" ${c.id === concertId ? 'selected' : ''}>${c.title}</option>`
+                    ).join('');
+
+                    if (!concertId) {
+                        concertId = allConcerts[0].id;
+                        selectEl.value = concertId;
+                    }
+                }
+
+                await loadSelectedConcert();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        async function switchConcert(newId) {
+            if (!newId || newId === concertId) return;
+            if (currentBooking) {
+                if (!confirm('Bạn đang trong phiên giữ chỗ. Chuyển sự kiện sẽ hủy phiên hiện tại. Bạn có chắc không?')) {
+                    document.getElementById('concert-select').value = concertId;
+                    return;
+                }
+            }
+            window.location.href = '/booking.html?id=' + newId;
+        }
+
+        async function loadSelectedConcert() {
+            try {
+                const cRes = await apiFetch('/concerts/' + concertId);
+                concertData = cRes.data;
+
+                document.getElementById('event-title').textContent = concertData.title;
+                document.getElementById('event-details').textContent = 'Nghệ sĩ: ' + concertData.artist + ' | Địa điểm: ' + concertData.venue + ' | Thời gian: ' + formatDateTime(concertData.startTime);
+
+                const posterEl = document.getElementById('event-poster');
+                if (concertData.posterUrl) {
+                    posterEl.src = concertData.posterUrl;
+                    posterEl.style.display = 'block';
+                }
+
+                const legendEl = document.getElementById('tier-legend');
+                legendEl.innerHTML = concertData.tiers.map(t => `
+                    <div class="legend-item">
+                        <div class="seat-dot" style="background: ${t.color};"></div>
+                        <span>${t.name} (${formatCurrency(t.price)})</span>
+                    </div>
+                `).join('');
+
+                await loadSeats();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        async function loadSeats() {
+            try {
+                selectedSeatIds.clear();
+                updateSelectedSidebar();
+                const res = await apiFetch('/concerts/' + concertId + '/seats');
+                allSeats = res.data;
+                renderSeats();
+            } catch (err) {
+                showToast('Lỗi tải sơ đồ ghế: ' + err.message, 'error');
+            }
+        }
+
+        function renderSeats() {
+            const gridEl = document.getElementById('seat-grid');
+            const rows = {};
+            allSeats.forEach(s => {
+                if (!rows[s.row]) rows[s.row] = [];
+                rows[s.row].push(s);
+            });
+
+            gridEl.innerHTML = Object.keys(rows).sort().map(r => `
+                <div class="seat-row">
+                    <span class="seat-row-label">${r}</span>
+                    ${rows[r].sort((a,b) => (a.seatNumber || 0) - (b.seatNumber || 0)).map(s => {
+                        const isSelected = selectedSeatIds.has(s.id);
+                        const isHeld = s.status === 'HELD';
+                        const isSold = s.status === 'SOLD';
+                        let cls = 'seat-btn';
+                        if (isSelected) cls += ' selected';
+                        else if (isHeld) cls += ' held';
+                        else if (isSold) cls += ' sold';
+
+                        const disabled = (isHeld || isSold) && !isSelected ? 'disabled' : '';
+                        return `<button class="${cls}" ${disabled} onclick="toggleSeat('${s.id}')" title="${s.seatCode} - ${s.tierName} (${formatCurrency(s.price)})">${s.seatNumber || (s.seatCode ? s.seatCode.split('-')[1] : '')}</button>`;
+                    }).join('')}
+                </div>
+            `).join('');
+        }
+
+        function toggleSeat(seatId) {
+            if (currentBooking) {
+                showToast('Bạn đang trong phiên giữ chỗ. Vui lòng hoàn tất thanh toán hoặc đợi hết giờ.', 'info');
+                return;
+            }
+
+            if (selectedSeatIds.has(seatId)) {
+                selectedSeatIds.delete(seatId);
+            } else {
+                if (selectedSeatIds.size >= 4) {
+                    showToast('Bạn chỉ được chọn tối đa 4 ghế trong một lượt đặt.', 'error');
+                    return;
+                }
+                selectedSeatIds.add(seatId);
+            }
+
+            renderSeats();
+            updateSelectedSidebar();
+        }
+
+        function updateSelectedSidebar() {
+            const listEl = document.getElementById('selected-seats-list');
+            const badgeEl = document.getElementById('selected-count-badge');
+            badgeEl.textContent = `${selectedSeatIds.size}/4 ghế`;
+
+            if (selectedSeatIds.size === 0) {
+                listEl.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 24px 0;">Chưa chọn ghế nào. Vui lòng bấm vào sơ đồ ghế bên trái (tối đa 4 ghế).</p>';
+                document.getElementById('btn-hold-seats').disabled = true;
+                return;
+            }
+
+            document.getElementById('btn-hold-seats').disabled = false;
+            const selectedSeats = allSeats.filter(s => selectedSeatIds.has(s.id));
+            listEl.innerHTML = selectedSeats.map(s => `
+                <div class="seat-item">
+                    <div>
+                        <strong style="color: #000000;">${s.seatCode}</strong>
+                        <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">(${s.tierName})</span>
+                    </div>
+                    <span style="font-weight: 700; color: #000000;">${formatCurrency(s.price)}</span>
+                </div>
+            `).join('');
+        }
+
+        async function handleHoldSeats() {
+            if (!Auth.isLoggedIn()) {
+                showToast('Vui lòng đăng nhập để tiến hành đặt vé!', 'error');
+                setTimeout(() => window.location.href = '/login.html', 1500);
+                return;
+            }
+
+            if (selectedSeatIds.size === 0) {
+                showToast('Vui lòng chọn ít nhất 1 ghế!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-hold-seats');
+            btn.disabled = true;
+            btn.textContent = 'Đang khóa ghế...';
+
+            try {
+                const res = await apiFetch('/bookings/hold', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        concertId: concertId,
+                        seatIds: Array.from(selectedSeatIds)
+                    })
+                });
+
+                currentBooking = res.data;
+                showToast('Giữ chỗ thành công! Bạn có 10 phút để thanh toán.', 'success');
+
+                btn.style.display = 'none';
+                document.getElementById('payment-section').style.display = 'block';
+                document.getElementById('hold-countdown-box').style.display = 'flex';
+
+                updateBill();
+                const exp = currentBooking.holdExpiresAt 
+                    ? new Date(currentBooking.holdExpiresAt) 
+                    : (currentBooking.remainingHoldSeconds 
+                        ? new Date(Date.now() + currentBooking.remainingHoldSeconds * 1000) 
+                        : new Date(Date.now() + 10 * 60 * 1000));
+                startCountdown(exp);
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'GIỮ CHỖ NGAY (10 PHÚT)';
+                loadSeats();
+            }
+        }
+
+        function updateBill() {
+            if (!currentBooking) return;
+            document.getElementById('bill-subtotal').textContent = formatCurrency(currentBooking.totalAmount);
+            document.getElementById('bill-discount').textContent = '-' + formatCurrency(currentBooking.discountAmount);
+            document.getElementById('bill-final').textContent = formatCurrency(currentBooking.finalAmount);
+
+            const amtEl = document.getElementById('vib-inline-amount');
+            if (amtEl) amtEl.textContent = formatCurrency(currentBooking.finalAmount || currentBooking.totalAmount);
+            const memoEl = document.getElementById('vib-inline-memo');
+            if (memoEl) memoEl.textContent = currentBooking.bookingCode || currentBooking.id;
+        }
+
+        async function handleApplyVoucher() {
+            const inputEl = document.getElementById('voucher-code');
+            const code = inputEl ? inputEl.value.trim() : '';
+            if (!code) {
+                showToast('Vui lòng nhập mã giảm giá (ví dụ: VIP50K hoặc ANHTRAI10)', 'error');
+                return;
+            }
+
+            if (!currentBooking) {
+                showToast('Vui lòng chọn ghế và giữ chỗ trước khi áp dụng mã giảm giá!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-apply-voucher');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Đang kiểm tra...';
+            }
+
+            try {
+                // Call standard backend endpoint: POST /api/v1/bookings/voucher
+                const res = await apiFetch('/bookings/voucher', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        bookingId: currentBooking.id,
+                        voucherCode: code
+                    })
+                });
+                currentBooking = res.data;
+                updateBill();
+                showToast('Áp dụng mã ' + code.toUpperCase() + ' thành công! Tiết kiệm: ' + formatCurrency(currentBooking.discountAmount), 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Áp dụng';
+                }
+            }
+        }
+
+
+
+        function startCountdown(expireDate) {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            function tick() {
+                const now = new Date().getTime();
+                const diff = expireDate.getTime() - now;
+
+                if (diff <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown-timer').textContent = '00:00';
+                    showToast('Đã hết thời gian giữ chỗ! Ghế đã được tự động giải phóng.', 'error');
+                    setTimeout(() => window.location.reload(), 2000);
+                    return;
+                }
+
+                const m = Math.floor(diff / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('countdown-timer').textContent = 
+                    `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+
+            tick();
+            countdownInterval = setInterval(tick, 1000);
+        }
+
+        async function handleProcessPayment() {
+            const btn = document.getElementById('btn-pay');
+            btn.disabled = true;
+            btn.textContent = 'Đang xử lý thanh toán...';
+
+            try {
+                const method = document.getElementById('payment-method').value;
+                const res = await apiFetch('/bookings/pay', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        bookingId: currentBooking.id,
+                        paymentMethod: method
+                    })
+                });
+
+                if (countdownInterval) clearInterval(countdownInterval);
+                showToast('Thanh toán thành công! Vé điện tử đã được phát hành.', 'success');
+                setTimeout(() => window.location.href = '/my-tickets.html', 1500);
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'XÁC NHẬN THANH TOÁN';
+            }
+        }
+
+        
+        
+        function getSelectedPaymentMethodName() {
+            const selected = document.querySelector('input[name="payment-method-choice"]:checked');
+            const val = selected ? selected.value : 'BANK_TRANSFER';
+            switch(val) {
+                case 'BANK_TRANSFER': return 'Chuyển khoản Ngân hàng';
+                case 'DOMESTIC_ATM': return 'Thẻ ATM Nội địa / Internet Banking';
+                case 'CREDIT_CARD': return 'Thẻ Quốc tế (Visa / MasterCard)';
+                case 'E_WALLET': return 'Ví điện tử (MoMo / ZaloPay)';
+                default: return 'Chuyển khoản Ngân hàng';
+            }
+        }
+
+        function openPaymentDemoModal() {
+            if (!currentBooking) {
+                showToast('Vui lòng giữ chỗ trước khi thanh toán!', 'error');
+                return;
+            }
+            const modal = document.getElementById('payment-demo-modal');
+            document.getElementById('demo-modal-booking-code').textContent = currentBooking.bookingCode || currentBooking.id;
+            document.getElementById('demo-modal-method-name').textContent = getSelectedPaymentMethodName();
+            document.getElementById('demo-modal-amount').textContent = formatCurrency(currentBooking.finalAmount || currentBooking.totalAmount);
+            
+            document.getElementById('demo-modal-body-action').style.display = 'block';
+            document.getElementById('demo-modal-body-result').style.display = 'none';
+
+            const btnSuccess = document.getElementById('btn-demo-success');
+            if (btnSuccess) {
+                btnSuccess.disabled = false;
+                btnSuccess.textContent = 'THANH TOÁN THÀNH CÔNG (CẤP VÉ)';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closePaymentDemoModal() {
+            const modal = document.getElementById('payment-demo-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handleDemoPaymentResult(isSuccess) {
+            const actionBox = document.getElementById('demo-modal-body-action');
+            const resultBox = document.getElementById('demo-modal-body-result');
+            const titleEl = document.getElementById('demo-result-title');
+            const descEl = document.getElementById('demo-result-desc');
+            const iconBox = document.getElementById('demo-result-icon-box');
+            const actionsEl = document.getElementById('demo-result-actions');
+
+            const methodChoice = document.querySelector('input[name="payment-method-choice"]:checked')?.value || 'BANK_TRANSFER';
+
+            if (isSuccess) {
+                const btnSuccess = document.getElementById('btn-demo-success');
+                btnSuccess.disabled = true;
+                btnSuccess.textContent = 'Đang xử lý giao dịch thành công...';
+
+                try {
+                    const res = await apiFetch('/bookings/pay', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            bookingId: currentBooking.id,
+                            paymentMethod: methodChoice
+                        })
+                    });
+
+                    actionBox.style.display = 'none';
+                    resultBox.style.display = 'block';
+
+                    iconBox.innerHTML = '<div style="width: 50px; height: 50px; border-radius: 50%; background: #10B981; color: #FFFFFF; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto;">✓</div>';
+                    titleEl.textContent = 'GIAO DỊCH THÀNH CÔNG!';
+                    titleEl.style.color = '#10B981';
+                    descEl.innerHTML = 'Thanh toán đã được ghi nhận vào hệ thống.<br><strong>Vé điện tử kèm mã QR đã được phát hành thành công!</strong><br>Đang chuyển hướng sang trang vé...';
+                    actionsEl.innerHTML = '<a href="/my-tickets.html" class="btn btn-primary" style="background: #000000; color: #FFFFFF; font-weight: 800; padding: 10px 20px;">XEM VÉ CỦA TÔI NGAY</a>';
+
+                    if (countdownInterval) clearInterval(countdownInterval);
+                    showToast('Thanh toán thành công! Vé điện tử đã được phát hành.', 'success');
+
+                    setTimeout(() => {
+                        window.location.href = '/my-tickets.html';
+                    }, 1400);
+                } catch (err) {
+                    showToast('Lỗi xử lý: ' + err.message, 'error');
+                    btnSuccess.disabled = false;
+                    btnSuccess.textContent = 'THANH TOÁN THÀNH CÔNG (CẤP VÉ)';
+                }
+            } else {
+                actionBox.style.display = 'none';
+                resultBox.style.display = 'block';
+
+                iconBox.innerHTML = '<div style="width: 50px; height: 50px; border-radius: 50%; background: #EF4444; color: #FFFFFF; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto;">✕</div>';
+                titleEl.textContent = 'GIAO DỊCH THẤT BẠI!';
+                titleEl.style.color = '#EF4444';
+                descEl.innerHTML = 'Mô phỏng: <strong>Giao dịch bị từ chối</strong> bởi ngân hàng.<br>Lý do: Thẻ/Tài khoản không đủ số dư hoặc người dùng hủy giao dịch.<br><em>(Chưa có vé nào được phát hành)</em>';
+                actionsEl.innerHTML = `
+                    <button type="button" class="btn btn-secondary" onclick="retryPaymentDemo()" style="font-weight: 800; padding: 10px 18px;">THỬ LẠI</button>
+                    <button type="button" class="btn btn-primary" onclick="closePaymentDemoModal()" style="font-weight: 800; padding: 10px 18px; background: #000000; color: #FFFFFF;">ĐÓNG</button>
+                `;
+
+                showToast('Thanh toán thất bại (Mô phỏng)! Chưa phát hành vé.', 'error');
+            }
+        }
+
+        function retryPaymentDemo() {
+            document.getElementById('demo-modal-body-action').style.display = 'block';
+            document.getElementById('demo-modal-body-result').style.display = 'none';
+            const btnSuccess = document.getElementById('btn-demo-success');
+            if (btnSuccess) {
+                btnSuccess.disabled = false;
+                btnSuccess.textContent = 'THANH TOÁN THÀNH CÔNG (CẤP VÉ)';
+            }
+        }
+
+        // Add interactive border highlight on payment method radio click
+        document.addEventListener('change', (e) => {
+            if (e.target.name === 'payment-method-choice') {
+                document.querySelectorAll('.pay-method-option').forEach(el => {
+                    el.style.border = '1px solid var(--border-light)';
+                });
+                const parentLabel = e.target.closest('.pay-method-option');
+                if (parentLabel) parentLabel.style.border = '2px solid #000000';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+com\concert\booking\ConcertControllerIntegrationTest.class
+com\concert\booking\JwtTokenProviderTest.class
+com\concert\booking\BookingServiceTest.class
+com\concert\booking\MongoConnectionTest.class
+com\concert\booking\ConcertBookingApplicationTests.class

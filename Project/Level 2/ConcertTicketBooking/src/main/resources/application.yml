@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: concert-ticket-booking
+  data:
+    mongodb:
+      # MongoDB Atlas URI (dung khi mang mo port 27017 hoac deploy):
+      # mongodb+srv://trunganhlaptrinh_db_user:123456%40@cluster0.gdbtdsz.mongodb.net/concert_booking?retryWrites=true&w=majority&appName=Cluster0
+      # MongoDB Local tren Docker:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/concert_booking}
+      auto-index-creation: true
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ConcertTicketBookingSecretKeyLevel2SecurityTokenMustBe256BitsLong2026}
+    expiration-ms: 86400000 # 24 gio
+  booking:
+    hold-timeout-minutes: 10 # Khoa giu cho 10 phut
+    max-tickets-per-booking: 4 # Toi da 4 ve moi don dat  oauth2:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:}
+    facebook:
+      app-id: ${FACEBOOK_APP_ID:}

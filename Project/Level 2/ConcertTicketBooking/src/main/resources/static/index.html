@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE SHOW - Hệ Thống Đặt Vé Concert Quốc Tế</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFFFFF;
+            color: #111827;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .glass-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
+        }
+        .glass-card:hover {
+            border-color: #000000;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Solid, robust button styling for Navbar */
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 22px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.25;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-btn-outline {
+            border: 1px solid #D1D5DB;
+            color: #1F2937;
+            background: #FFFFFF;
+        }
+        .nav-btn-outline:hover {
+            border-color: #000000;
+            color: #000000;
+        }
+        .nav-btn-primary {
+            background: #000000;
+            color: #FFFFFF;
+            border: 1px solid #000000;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .nav-btn-primary:hover {
+            background: #27272A;
+        }
+        .nav-user-pill {
+            padding: 7px 18px;
+            border-radius: 9999px;
+            border: 1px solid #000000;
+            font-size: 13px;
+            font-weight: 700;
+            color: #000000;
+            background: #FFFFFF;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            min-width: 320px;
+            max-width: 560px;
+            background: #000000;
+            color: #FFFFFF;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+            animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .toast-success { border-top: 3px solid #10B981; }
+        .toast-error { border-top: 3px solid #EF4444; }
+        .toast-info { border-top: 3px solid #3B82F6; }
+        @keyframes toastSlideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-black selection:text-white">
+
+    <!-- Navbar with Language Switcher and Styled Buttons -->
+    <nav class="fixed top-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="/index.html" class="flex items-center gap-3">
+                <img src="/images/logo-the-show.png" alt="THE SHOW" class="h-10 w-auto object-contain">
+                <span class="font-black text-2xl tracking-wider text-black">THE SHOW</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-700">
+                <a href="#features" data-i18n="nav.features" class="hover:text-black transition-colors">Tính Năng</a>
+                <a href="#concerts" data-i18n="nav.concerts" class="hover:text-black transition-colors">Sự Kiện</a>
+                <a href="#pricing" data-i18n="nav.pricing" class="hover:text-black transition-colors">Hạng Vé</a>
+                <a href="#faq" data-i18n="nav.faq" class="hover:text-black transition-colors">Hỏi Đáp</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Navbar Language Switcher -->
+                <div class="flex items-center gap-1.5 border border-zinc-300 rounded-full px-2.5 py-1 bg-white shadow-xs">
+                    <button type="button" onclick="setAppLanguage('vi')" id="nav-lang-vi" class="text-xs font-black text-black cursor-pointer">VI</button>
+                    <span class="text-zinc-300 text-xs">|</span>
+                    <button type="button" onclick="setAppLanguage('en')" id="nav-lang-en" class="text-xs font-semibold text-zinc-400 hover:text-black cursor-pointer">EN</button>
+                </div>
+
+                <!-- Nav Action Buttons with Full CSS Styling -->
+                <div id="nav-actions" class="flex items-center gap-3">
+                    <a href="/login.html" class="nav-btn nav-btn-outline" data-i18n="nav.login">Đăng Nhập</a>
+                    <a href="/register.html" class="nav-btn nav-btn-primary" data-i18n="nav.register">Đăng Ký</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Header with Full Vivid Video Background (NO PERIODS IN TITLE!) -->
+    <header class="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-20 overflow-hidden">
+        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
+            <source src="/video.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-black/35 z-10"></div>
+        <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/40 to-transparent z-10 pointer-events-none"></div>
+
+        <div class="relative z-20 flex flex-col items-center text-center px-4 max-w-5xl mx-auto">
+            <div class="inline-flex items-center px-5 py-2 rounded-full border border-white/30 bg-black/40 backdrop-blur-md mb-8">
+                <span class="text-xs font-bold tracking-widest text-white uppercase" data-i18n="hero.badge">HỆ THỐNG ĐẶT VÉ CONCERT QUỐC TẾ</span>
+            </div>
+
+            <!-- Title without periods -->
+            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight mb-12 leading-tight text-white drop-shadow-lg" data-i18n-html="hero.title">
+                Cảm Xúc Thật <br>
+                <span>Sân Khấu Đỉnh Cao</span>
+            </h1>
+
+            <div class="flex flex-col sm:flex-row gap-5 justify-center w-full max-w-md">
+                <a href="/booking.html" data-i18n="hero.btn_book" class="px-9 py-4 bg-white text-black rounded-full font-bold text-base hover:bg-zinc-100 shadow-2xl text-center transition-all duration-200">
+                    Đặt Vé Ngay
+                </a>
+                <a href="#concerts" data-i18n="hero.btn_explore" class="px-9 py-4 bg-black/60 text-white border border-white/50 backdrop-blur-md rounded-full font-bold text-base hover:bg-black/80 hover:border-white text-center transition-all duration-200 shadow-lg">
+                    Khám Phá Sự Kiện
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <section class="py-12 border-y border-zinc-200 bg-white">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <p class="text-3xl md:text-4xl font-black text-zinc-950" data-i18n="stats.audience_val">100.000+</p>
+                <p class="text-xs md:text-sm font-medium text-zinc-600 mt-1 uppercase tracking-wider" data-i18n="stats.audience_lbl">Khán giả tin dùng</p>
+            </div>
+            <div>
+                <p class="text-3xl md:text-4xl font-black text-zinc-950" data-i18n="stats.tours_val">50+</p>
+                <p class="text-xs md:text-sm font-medium text-zinc-600 mt-1 uppercase tracking-wider" data-i18n="stats.tours_lbl">Tour diễn quốc tế</p>
+            </div>
+            <div>
+                <p class="text-3xl md:text-4xl font-black text-zinc-950" data-i18n="stats.hold_val">10 PHÚT</p>
+                <p class="text-xs md:text-sm font-medium text-zinc-600 mt-1 uppercase tracking-wider" data-i18n="stats.hold_lbl">Giữ chỗ an toàn</p>
+            </div>
+            <div>
+                <p class="text-3xl md:text-4xl font-black text-zinc-950" data-i18n="stats.authentic_val">100%</p>
+                <p class="text-xs md:text-sm font-medium text-zinc-600 mt-1 uppercase tracking-wider" data-i18n="stats.authentic_lbl">Vé điện tử chính hãng</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (Subtitle line deleted) -->
+    <section id="features" class="py-28 px-6 bg-[#F9FAFB]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-zinc-950 mb-4" data-i18n="features.heading">Trải Nghiệm Đặt Vé Khác Biệt</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center font-black text-lg mb-6">01</div>
+                    <h3 class="text-xl font-bold text-zinc-950 mb-3" data-i18n="features.card1_title">Sơ Đồ Ghế Thời Gian Thực</h3>
+                    <p class="text-zinc-600 leading-relaxed text-sm" data-i18n="features.card1_desc">Quan sát toàn cảnh khán đài, lựa chọn trực quan từng hàng ghế VIP hay khu vực đứng GA với dữ liệu cập nhật theo từng giây.</p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center font-black text-lg mb-6">02</div>
+                    <h3 class="text-xl font-bold text-zinc-950 mb-3" data-i18n="features.card2_title">Khóa Ghế 10 Phút Thông Minh</h3>
+                    <p class="text-zinc-600 leading-relaxed text-sm" data-i18n="features.card2_desc">Khi bạn chọn ghế, hệ thống lập tức khóa chỗ trong 10 phút. Bạn an tâm điền thông tin và thanh toán mà không sợ bị trùng ghế.</p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center font-black text-lg mb-6">03</div>
+                    <h3 class="text-xl font-bold text-zinc-950 mb-3" data-i18n="features.card3_title">Vé Điện Tử QR Code Bảo Mật</h3>
+                    <p class="text-zinc-600 leading-relaxed text-sm" data-i18n="features.card3_desc">Nhận mã QR check-in độc quyền tức thì trên tài khoản và qua Email. Soát vé siêu tốc tại cổng, chống vé giả tuyệt đối.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Concerts Section (Subtitle line deleted, Real Images loaded) -->
+    <section id="concerts" class="py-28 px-6 bg-white border-t border-zinc-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-14 gap-6">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-zinc-950 mb-3" data-i18n="concerts.heading">Sự Kiện Đang Mở Đặt</h2>
+                </div>
+                <a href="/booking.html" data-i18n="concerts.view_all" class="text-sm font-bold text-black border-b-2 border-black pb-1 hover:text-zinc-700 transition-colors">
+                    TẤT CẢ CONCERT
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1: Anh Trai Say Hi -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+                        <img src="/images/AnhTraiSayHi2_logo.jpg" alt="Anh Trai Say Hi Live Concert 2026" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded bg-black text-white text-xs font-semibold" data-i18n="concerts.tag_liveshow">LIVE SHOW</span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Sân vận động Mỹ Đình · 12/11/2026</p>
+                        <h3 class="text-lg font-bold text-zinc-950 mb-3">Anh Trai Say Hi Live</h3>
+                        <div class="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-zinc-500 block" data-i18n="concerts.from_price">Giá từ</span>
+                                <span class="text-base font-extrabold text-zinc-950">2.000.000 ₫</span>
+                            </div>
+                            <a href="/booking.html?id=6ace2f95ae02dd31f4fd31b0" data-i18n="concerts.btn_book" class="px-4 py-2 rounded-full bg-black text-white text-xs font-bold hover:bg-zinc-800 transition-colors">Đặt Vé</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Sơn Tùng M-TP x Red Bull -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+                        <img src="/images/RedBull-son-tung.jpg" alt="Sơn Tùng M-TP x Red Bull" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded bg-black text-white text-xs font-semibold" data-i18n="concerts.tag_hot">HOT TOUR</span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Nhà thi đấu Quân Khu 7 · 05/01/2027</p>
+                        <h3 class="text-lg font-bold text-zinc-950 mb-3">Sơn Tùng M-TP Live Tour</h3>
+                        <div class="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-zinc-500 block" data-i18n="concerts.from_price">Giá từ</span>
+                                <span class="text-base font-extrabold text-zinc-950">1.200.000 ₫</span>
+                            </div>
+                            <a href="/booking.html?id=6ace2f95ae02dd31f4fd3229" data-i18n="concerts.btn_book" class="px-4 py-2 rounded-full bg-black text-white text-xs font-bold hover:bg-zinc-800 transition-colors">Đặt Vé</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Sóng 26 -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+                        <img src="/images/song-26.jpeg" alt="Sóng 26 - Đại Nhạc Hội Giao Thừa" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded bg-black text-white text-xs font-semibold" data-i18n="concerts.tag_festival">LỄ HỘI</span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Quảng trường Thời Đại · 31/12/2026</p>
+                        <h3 class="text-lg font-bold text-zinc-950 mb-3">Countdown Festival 2027</h3>
+                        <div class="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-zinc-500 block" data-i18n="concerts.from_price">Giá từ</span>
+                                <span class="text-base font-extrabold text-zinc-950">450.000 ₫</span>
+                            </div>
+                            <a href="/booking.html?id=6ace2f95ae02dd31f4fd327a" data-i18n="concerts.btn_book" class="px-4 py-2 rounded-full bg-black text-white text-xs font-bold hover:bg-zinc-800 transition-colors">Đặt Vé</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: V-Concert -->
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+                        <img src="/images/v-concert.jpg" alt="V-Concert - Rực Rỡ Hòa Ca" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded bg-black text-white text-xs font-semibold" data-i18n="concerts.tag_upcoming">SẮP DIỄN RA</span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Trung tâm Hội nghị Quốc gia · 20/12/2026</p>
+                        <h3 class="text-lg font-bold text-zinc-950 mb-3">V-Concert Rực Rỡ Hòa Ca</h3>
+                        <div class="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-zinc-500 block" data-i18n="concerts.from_price">Giá từ</span>
+                                <span class="text-base font-extrabold text-zinc-950">650.000 ₫</span>
+                            </div>
+                            <a href="/booking.html?id=6ace2f95ae02dd31f4fd32cb" data-i18n="concerts.btn_book" class="px-4 py-2 rounded-full bg-black text-white text-xs font-bold hover:bg-zinc-800 transition-colors">Đặt Vé</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ticket Tiers / Pricing Section -->
+    <section id="pricing" class="py-28 px-6 bg-[#F9FAFB] border-t border-zinc-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-5xl font-black text-zinc-950 mb-4" data-i18n="pricing.heading">Bảng Hạng Vé Linh Hoạt</h2>
+                <p class="text-zinc-600 text-base" data-i18n="pricing.subheading">Lựa chọn vị trí trải nghiệm âm nhạc phù hợp nhất với phong cách của bạn.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Standard Tier -->
+                <div class="glass-card p-8 rounded-2xl flex flex-col">
+                    <h3 class="text-xl font-bold text-zinc-950 mb-2" data-i18n="pricing.std_title">GA Standard</h3>
+                    <p class="text-xs text-zinc-500 mb-6" data-i18n="pricing.std_sub">Khu vực đứng tự do sôi động</p>
+                    <div class="flex items-baseline gap-1 mb-8">
+                        <span class="text-4xl font-black text-zinc-950">650.000</span>
+                        <span class="text-zinc-500 text-sm font-semibold" data-i18n="pricing.per_ticket">₫ / vé</span>
+                    </div>
+                    <ul class="space-y-4 mb-8 flex-1 text-sm text-zinc-600">
+                        <li class="flex items-center gap-3" data-i18n="pricing.std_p1">• Vị trí đứng khu vực trung tâm</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.std_p2">• Vé điện tử QR Code bảo mật</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.std_p3">• Xác nhận tức thì qua Email</li>
+                    </ul>
+                    <a href="/booking.html" data-i18n="pricing.std_btn" class="w-full py-3 rounded-full border border-black bg-white text-black font-semibold text-center hover:bg-zinc-100 transition-colors text-sm">
+                        Chọn Hạng Standard
+                    </a>
+                </div>
+
+                <!-- VIP Tier (Featured) -->
+                <div class="glass-card p-8 rounded-2xl flex flex-col relative border-2 border-black bg-white shadow-xl">
+                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider" data-i18n="pricing.most_popular">
+                        PHỔ BIẾN NHẤT
+                    </div>
+                    <h3 class="text-xl font-black text-zinc-950 mb-2" data-i18n="pricing.vip_title">VIP Diamond</h3>
+                    <p class="text-xs text-zinc-500 mb-6" data-i18n="pricing.vip_sub">Ghế ngồi trung tâm tầm nhìn đẹp</p>
+                    <div class="flex items-baseline gap-1 mb-8">
+                        <span class="text-4xl font-black text-zinc-950">1.800.000</span>
+                        <span class="text-zinc-500 text-sm font-semibold" data-i18n="pricing.per_ticket">₫ / vé</span>
+                    </div>
+                    <ul class="space-y-4 mb-8 flex-1 text-sm text-zinc-800 font-medium">
+                        <li class="flex items-center gap-3" data-i18n="pricing.vip_p1">• Ghế ngồi êm ái góc nhìn trực diện</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.vip_p2">• Lối vào ưu tiên (Fast Track)</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.vip_p3">• Quà lưu niệm độc quyền ban tổ chức</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.vip_p4">• Vòng tay kỷ niệm phát sáng</li>
+                    </ul>
+                    <a href="/booking.html" data-i18n="pricing.vip_btn" class="w-full py-3.5 rounded-full bg-black text-white font-bold text-center hover:bg-zinc-800 transition-colors text-sm shadow-md">
+                        Chọn Hạng VIP Diamond
+                    </a>
+                </div>
+
+                <!-- VVIP Tier -->
+                <div class="glass-card p-8 rounded-2xl flex flex-col">
+                    <h3 class="text-xl font-bold text-zinc-950 mb-2" data-i18n="pricing.vvip_title">VVIP Lounge</h3>
+                    <p class="text-xs text-zinc-500 mb-6" data-i18n="pricing.vvip_sub">Đặc quyền giới hạn hàng đầu</p>
+                    <div class="flex items-baseline gap-1 mb-8">
+                        <span class="text-4xl font-black text-zinc-950">3.500.000</span>
+                        <span class="text-zinc-500 text-sm font-semibold" data-i18n="pricing.per_ticket">₫ / vé</span>
+                    </div>
+                    <ul class="space-y-4 mb-8 flex-1 text-sm text-zinc-600">
+                        <li class="flex items-center gap-3" data-i18n="pricing.vvip_p1">• Hàng ghế đầu sát mép sân khấu</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.vvip_p2">• Thẻ Soundcheck Pass tổng duyệt</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.vvip_p3">• Phòng chờ VIP với thức uống miễn phí</li>
+                        <li class="flex items-center gap-3" data-i18n="pricing.vvip_p4">• Chụp ảnh kỷ niệm cùng nghệ sĩ</li>
+                    </ul>
+                    <a href="/booking.html" data-i18n="pricing.vvip_btn" class="w-full py-3 rounded-full border border-black bg-white text-black font-semibold text-center hover:bg-zinc-100 transition-colors text-sm">
+                        Chọn Hạng VVIP
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-28 px-6 bg-white border-t border-zinc-200">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-12 text-center text-zinc-950" data-i18n="faq.heading">Câu Hỏi Thường Gặp</h2>
+            <div class="space-y-4">
+                <details class="glass-card rounded-xl p-6 group cursor-pointer">
+                    <summary class="font-bold text-zinc-900 list-none flex justify-between items-center">
+                        <span data-i18n="faq.q1">Tôi nhận vé và sử dụng mã QR như thế nào?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform font-mono">▼</span>
+                    </summary>
+                    <p class="text-zinc-600 mt-4 text-sm leading-relaxed border-t border-zinc-100 pt-3" data-i18n="faq.a1">
+                        Sau khi hoàn tất thanh toán, vé điện tử kèm mã QR duy nhất được cấp ngay trong mục "Vé Của Tôi" trên website và đồng thời gửi qua Email đã đăng ký. Bạn chỉ cần đưa mã QR tại cổng kiểm soát để vào sự kiện.
+                    </p>
+                </details>
+
+                <details class="glass-card rounded-xl p-6 group cursor-pointer">
+                    <summary class="font-bold text-zinc-900 list-none flex justify-between items-center">
+                        <span data-i18n="faq.q2">Cơ chế giữ chỗ 10 phút hoạt động ra sao?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform font-mono">▼</span>
+                    </summary>
+                    <p class="text-zinc-600 mt-4 text-sm leading-relaxed border-t border-zinc-100 pt-3" data-i18n="faq.a2">
+                        Khi bạn nhấn chọn ghế, hệ thống sẽ tạm thời khóa chỗ trong 10 phút. Trong thời gian này, không một ai khác có thể mua trùng vị trí của bạn, giúp bạn thoải mái điền thông tin và thanh toán.
+                    </p>
+                </details>
+
+                <details class="glass-card rounded-xl p-6 group cursor-pointer">
+                    <summary class="font-bold text-zinc-900 list-none flex justify-between items-center">
+                        <span data-i18n="faq.q3">Nếu quá 10 phút tôi chưa hoàn tất thanh toán thì sao?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform font-mono">▼</span>
+                    </summary>
+                    <p class="text-zinc-600 mt-4 text-sm leading-relaxed border-t border-zinc-100 pt-3" data-i18n="faq.a3">
+                        Khi đồng hồ đếm ngược 10 phút kết thúc, hệ thống tự động giải phóng vị trí ghế trở lại sơ đồ để các khán giả khác có cơ hội đặt mua.
+                    </p>
+                </details>
+
+                <details class="glass-card rounded-xl p-6 group cursor-pointer">
+                    <summary class="font-bold text-zinc-900 list-none flex justify-between items-center">
+                        <span data-i18n="faq.q4">Hệ thống hỗ trợ những phương thức thanh toán nào?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform font-mono">▼</span>
+                    </summary>
+                    <p class="text-zinc-600 mt-4 text-sm leading-relaxed border-t border-zinc-100 pt-3" data-i18n="faq.a4">
+                        THE SHOW hỗ trợ thanh toán qua Chuyển khoản ngân hàng, Thẻ ATM nội địa, Thẻ quốc tế Visa/MasterCard và Ví điện tử.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comprehensive Rich Footer with Bilingual Language Switcher -->
+    <footer class="pt-20 pb-12 px-6 border-t border-zinc-200 bg-[#FAFAFA] text-zinc-700">
+        <div class="max-w-7xl mx-auto">
+            <!-- Brand & Intro & Language Switcher -->
+            <div class="mb-14 pb-10 border-b border-zinc-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <img src="/images/logo-the-show.png" alt="THE SHOW" class="h-10 w-auto object-contain">
+                        <span class="font-black text-2xl tracking-wider text-black">THE SHOW</span>
+                    </div>
+                    <p class="text-sm text-zinc-600 max-w-xl" data-i18n="footer.desc">
+                        Nền tảng phân phối & đặt vé concert quốc tế hàng đầu. Chọn chỗ trực quan thời gian thực, giữ ghế 10 phút an toàn và nhận vé điện tử QR Code bảo mật tức thì.
+                    </p>
+                </div>
+                <!-- Interactive Bilingual Switcher in Footer -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider" data-i18n="footer.language">Ngôn Ngữ:</span>
+                    <button type="button" onclick="setAppLanguage('vi')" id="footer-lang-vi" class="text-xs font-bold text-black border-b border-black pb-0.5 cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0">Tiếng Việt</button>
+                    <span class="text-zinc-300">|</span>
+                    <button type="button" onclick="setAppLanguage('en')" id="footer-lang-en" class="text-xs font-medium text-zinc-500 hover:text-black cursor-pointer bg-transparent border-none">English</button>
+                </div>
+            </div>
+
+            <!-- Footer Columns Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16 text-sm">
+                <!-- Col 1: Sản Phẩm -->
+                <div>
+                    <h4 class="font-bold text-zinc-950 uppercase text-xs tracking-wider mb-4" data-i18n="footer.col_products">Sản Phẩm</h4>
+                    <ul class="space-y-2.5 text-zinc-600">
+                        <li><a href="/index.html" class="hover:text-black transition-colors" data-i18n="footer.link_home">Trang Chủ</a></li>
+                        <li><a href="/booking.html" class="hover:text-black transition-colors" data-i18n="footer.link_booking">Đặt Vé Concert</a></li>
+                        <li><a href="/index.html#concerts" class="hover:text-black transition-colors" data-i18n="footer.link_upcoming">Sự Kiện Đang Mở Bán</a></li>
+                        <li><a href="/my-tickets.html" class="hover:text-black transition-colors" data-i18n="footer.link_my_tickets">Vé Điện Tử Của Tôi</a></li>
+                        <li><a href="/index.html#pricing" class="hover:text-black transition-colors" data-i18n="footer.link_pricing">Bảng Giá & Hạng Vé</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 2: Chính Sách -->
+                <div>
+                    <h4 class="font-bold text-zinc-950 uppercase text-xs tracking-wider mb-4" data-i18n="footer.col_policies">Chính Sách</h4>
+                    <ul class="space-y-2.5 text-zinc-600">
+                        <li><a href="/policies/privacy.html" class="hover:text-black transition-colors" data-i18n="footer.policy_privacy">Chính sách bảo mật</a></li>
+                        <li><a href="/policies/privacy.html#data" class="hover:text-black transition-colors" data-i18n="footer.policy_data">Bảo vệ dữ liệu cá nhân</a></li>
+                        <li><a href="/policies/payment.html#pricing" class="hover:text-black transition-colors" data-i18n="footer.policy_pricing">Chính sách giá vé</a></li>
+                        <li><a href="/policies/payment.html" class="hover:text-black transition-colors" data-i18n="footer.policy_payment">Chính sách thanh toán</a></li>
+                        <li><a href="/policies/refund.html" class="hover:text-black transition-colors" data-i18n="footer.policy_refund">Chính sách hoàn & đổi vé</a></li>
+                        <li><a href="/policies/support.html" class="hover:text-black transition-colors" data-i18n="footer.policy_support">Hình thức hỗ trợ trực tuyến</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Điều Khoản & Quy Định -->
+                <div>
+                    <h4 class="font-bold text-zinc-950 uppercase text-xs tracking-wider mb-4" data-i18n="footer.col_terms">Điều Khoản & Quy Định</h4>
+                    <ul class="space-y-2.5 text-zinc-600">
+                        <li><a href="/policies/terms.html" class="hover:text-black transition-colors" data-i18n="footer.term_rights">Quyền & nghĩa vụ các bên</a></li>
+                        <li><a href="/policies/support.html#complaint" class="hover:text-black transition-colors" data-i18n="footer.term_complaint">Tiếp nhận & giải quyết khiếu nại</a></li>
+                        <li><a href="/policies/terms.html#conditions" class="hover:text-black transition-colors" data-i18n="footer.term_conditions">Điều kiện & hạn chế dịch vụ</a></li>
+                        <li><a href="/policies/terms.html#provision" class="hover:text-black transition-colors" data-i18n="footer.term_provision">Cung cấp dịch vụ vé</a></li>
+                        <li><a href="/policies/terms.html#termination" class="hover:text-black transition-colors" data-i18n="footer.term_termination">Chấm dứt dịch vụ</a></li>
+                        <li><a href="/policies/terms.html#disclaimer" class="hover:text-black transition-colors" data-i18n="footer.term_disclaimer">Tuyên bố miễn trừ trách nhiệm</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Giá Cả & Hạng Vé -->
+                <div>
+                    <h4 class="font-bold text-zinc-950 uppercase text-xs tracking-wider mb-4" data-i18n="footer.col_pricing">Giá Cả & Hạng Vé</h4>
+                    <div class="space-y-2 text-zinc-600">
+                        <p class="font-medium text-zinc-900">GA Standard: từ 450.000 ₫</p>
+                        <p class="font-medium text-zinc-900">VIP Diamond: từ 1.800.000 ₫</p>
+                        <p class="font-medium text-zinc-900">VVIP Lounge: từ 3.500.000 ₫</p>
+                        <a href="/booking.html" class="inline-block mt-3 text-xs font-bold text-black border-b border-black pb-0.5" data-i18n="hero.btn_book">Đặt Vé Ngay</a>
+                    </div>
+
+                    <h4 class="font-bold text-zinc-950 uppercase text-xs tracking-wider mt-6 mb-3" data-i18n="footer.payment_methods">Phương Thức Thanh Toán</h4>
+                    <div class="text-xs text-zinc-600 space-y-1">
+                        <p>Bank Transfer · Domestic ATM</p>
+                        <p>Visa · MasterCard · E-Wallet</p>
+                    </div>
+                </div>
+
+                <!-- Col 5: Công Ty & Trụ Sở (Mock / Sandbox Info clearly identified) -->
+                <div>
+                    <h4 class="font-bold text-zinc-950 uppercase text-xs tracking-wider mb-4" data-i18n="footer.col_operator">Đơn Vị Vận Hành (Demo)</h4>
+                    <div class="text-xs text-zinc-600 space-y-2 leading-relaxed">
+                        <p class="font-bold text-zinc-900" data-i18n="footer.company_name">Công ty Cổ phần Sự kiện THE SHOW (Demo Sandbox)</p>
+                        <p data-i18n="footer.tax_id">Mã số thuế: 1234567890-DEMO</p>
+                        <p data-i18n="footer.address">TRỤ SỞ CHÍNH: Tầng 18, Tòa nhà Keangnam Landmark 72, Mễ Trì, Nam Từ Liêm, Hà Nội, Việt Nam</p>
+                        <p data-i18n="footer.hotline">Hotline: 1900 1234 (Thử nghiệm)</p>
+                        <p data-i18n="footer.email">Email: support@theshow-demo.vn</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer & Copyright Bottom -->
+            <div class="pt-8 border-t border-zinc-200 text-xs text-zinc-500 space-y-3 leading-relaxed">
+                <p data-i18n="footer.disclaimer1">
+                    Sử dụng nội dung ở trang này và dịch vụ tại THE SHOW có nghĩa là bạn đồng ý với Thỏa thuận sử dụng và Chính sách bảo mật của chúng tôi.
+                </p>
+                <p data-i18n="footer.disclaimer2">
+                    THE SHOW là dự án mô phỏng hệ thống phân phối vé concert độc lập phục vụ mục đích học tập và kiểm thử phần mềm (Demo Sandbox). Mọi thông tin doanh nghiệp (MST: 1234567890-DEMO), số hotline và nghệ sĩ chỉ mang tính chất minh họa chức năng kỹ thuật.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t border-zinc-200/60 gap-3">
+                    <p data-i18n="footer.copyright">© 2026 THE SHOW Entertainment Joint Stock Company (Demo / Sandbox Project). All rights reserved.</p>
+                    <p class="text-zinc-400" data-i18n="footer.audience_tag">Được tạo cho người yêu âm nhạc và khán giả concert toàn cầu.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

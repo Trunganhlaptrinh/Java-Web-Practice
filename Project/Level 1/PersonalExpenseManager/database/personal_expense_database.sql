@@ -1,4 +1,4 @@
--- Personal Expense Manager - Level 1 database
+authorized_peersauthorized_peers-- Personal Expense Manager - Level 1 database
 
 DROP DATABASE IF EXISTS personal_expense_manager;
 CREATE DATABASE personal_expense_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -1,0 +1,29 @@
+services:
+  db:
+    image: mongo:7.0
+    container_name: ctb-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ctb_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: ctb-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MONGODB_URI: "mongodb://db:27017/concert_booking"
+    ports:
+      - "8080:8080"
+
+volumes:
+  ctb_mongo_data:
