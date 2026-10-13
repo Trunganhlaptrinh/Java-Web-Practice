@@ -12,7 +12,7 @@ docker compose up --build
 
 Lần đầu build sẽ mất khoảng 2-3 phút để tải image Maven, Temurin JDK 21, MongoDB và build ứng dụng.
 
-Khi thấy dòng `Started ConcertBookingApplication in [...] seconds`, mở trình duyệt tại:
+NẾU THẤY MongoDB nó chạy liên tục thì k phải lỗi đâu nhé! thành công và hoàn toàn bình thường
 
 **http://localhost:8080**
 
