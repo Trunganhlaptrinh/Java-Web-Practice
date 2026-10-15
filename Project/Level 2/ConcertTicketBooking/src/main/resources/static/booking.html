@@ -259,14 +259,14 @@
 
                 const selectEl = document.getElementById('concert-select');
                 if (allConcerts.length > 0) {
+                    const exists = allConcerts.some(c => c.id === concertId);
+                    if (!concertId || !exists) {
+                        concertId = allConcerts[0].id;
+                    }
                     selectEl.innerHTML = allConcerts.map(c => 
                         `<option value="${c.id}" ${c.id === concertId ? 'selected' : ''}>${c.title}</option>`
                     ).join('');
-
-                    if (!concertId) {
-                        concertId = allConcerts[0].id;
-                        selectEl.value = concertId;
-                    }
+                    selectEl.value = concertId;
                 }
 
                 await loadSelectedConcert();
@@ -339,8 +339,8 @@
                     <span class="seat-row-label">${r}</span>
                     ${rows[r].sort((a,b) => (a.seatNumber || 0) - (b.seatNumber || 0)).map(s => {
                         const isSelected = selectedSeatIds.has(s.id);
-                        const isHeld = s.status === 'HELD';
-                        const isSold = s.status === 'SOLD';
+                        const isHeld = s.status === 'HELD' && !s.isHeldByCurrentUser;
+                        const isSold = s.status === 'SOLD' || s.status === 'BOOKED';
                         let cls = 'seat-btn';
                         if (isSelected) cls += ' selected';
                         else if (isHeld) cls += ' held';

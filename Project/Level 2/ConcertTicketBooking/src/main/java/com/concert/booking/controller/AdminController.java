@@ -4,6 +4,7 @@ import com.concert.booking.dto.request.EmailBotConfigRequest;
 import com.concert.booking.dto.response.ApiResponse;
 import com.concert.booking.dto.response.EmailBotConfigResponse;
 import com.concert.booking.model.Booking;
+import com.concert.booking.model.BookingStatus;
 import com.concert.booking.model.User;
 import com.concert.booking.model.Voucher;
 import com.concert.booking.repository.BookingRepository;
@@ -72,7 +73,7 @@ public class AdminController {
         long totalBookings = bookings.size();
 
         BigDecimal totalRevenue = bookings.stream()
-                .filter(b -> b.getFinalAmount() != null)
+                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED && b.getFinalAmount() != null)
                 .map(Booking::getFinalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -82,6 +83,7 @@ public class AdminController {
         stats.put("totalBookings", totalBookings);
         stats.put("totalRevenue", totalRevenue);
         stats.put("totalTicketsIssued", totalTickets);
+        stats.put("totalTickets", totalTickets);
 
         return ResponseEntity.ok(ApiResponse.success("Lấy thống kê hệ thống thành công", stats));
     }

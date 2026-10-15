@@ -11,7 +11,6 @@ import com.concert.booking.model.*;
 import com.concert.booking.repository.*;
 import com.concert.booking.service.BookingService;
 import com.concert.booking.service.EmailService;
-import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -303,7 +302,7 @@ public class BookingServiceImpl implements BookingService {
             generatedTickets.add(ticketRepository.save(ticket));
         }
 
-        // 3. TÄƒng usedCount náº¿u cÃ³ dÃ¹ng voucher
+        // 3. Tăng usedCount nếu có dùng voucher
         if (booking.getVoucherCode() != null && !booking.getVoucherCode().isBlank()) {
             voucherRepository.findByCodeIgnoreCaseAndActiveTrue(booking.getVoucherCode()).ifPresent(v -> {
                 v.setUsedCount(v.getUsedCount() + 1);
@@ -311,7 +310,21 @@ public class BookingServiceImpl implements BookingService {
             });
         }
 
-        // 4. Chuyá»ƒn tráº¡ng thÃ¡i Ä‘Æ¡n sang PAID
+        // 4. Cập nhật số lượng vé khả dụng trong các hạng vé của concert
+        if (concert.getTiers() != null && booking.getItems() != null) {
+            Map<String, Long> bookedTierCounts = booking.getItems().stream()
+                    .filter(item -> item.getTierName() != null)
+                    .collect(Collectors.groupingBy(BookingItem::getTierName, Collectors.counting()));
+            for (TicketTier tier : concert.getTiers()) {
+                Long count = bookedTierCounts.get(tier.getName());
+                if (count != null) {
+                    tier.setAvailableCount(Math.max(0, tier.getAvailableCount() - count.intValue()));
+                }
+            }
+            concertRepository.save(concert);
+        }
+
+        // 5. Chuyển trạng thái đơn sang CONFIRMED
         booking.setStatus(BookingStatus.CONFIRMED);
         booking.setPaymentMethod(request.getPaymentMethod());
         Booking paidBooking = bookingRepository.save(booking);

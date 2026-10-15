@@ -317,21 +317,40 @@
                     `;
                 } else {
                     tbody.innerHTML = bookings.map(b => {
-                        const isPaid = (b.status === 'PAID');
-                        if (isPaid) paidCount += (b.seatIds ? b.seatIds.length : 1);
-                        else if (b.status === 'PENDING') pendingCount += 1;
+                        const isPaid = (b.status === 'CONFIRMED' || b.status === 'PAID');
+                        const isPending = (b.status === 'PENDING_PAYMENT' || b.status === 'PENDING');
+                        const ticketCount = b.items ? b.items.length : (b.seatIds ? b.seatIds.length : 1);
+                        
+                        if (isPaid) paidCount += ticketCount;
+                        else if (isPending) pendingCount += 1;
 
-                        const badgeBg = isPaid ? '#000000' : '#6B7280';
-                        const badgeText = isPaid ? 'ĐÃ THANH TOÁN' : b.status;
+                        let badgeBg = '#6B7280';
+                        let badgeText = b.status;
+                        if (isPaid) {
+                            badgeBg = '#000000';
+                            badgeText = 'ĐÃ THANH TOÁN';
+                        } else if (isPending) {
+                            badgeBg = '#D97706';
+                            badgeText = 'CHỜ THANH TOÁN';
+                        } else if (b.status === 'EXPIRED') {
+                            badgeBg = '#EF4444';
+                            badgeText = 'ĐÃ HẾT HẠN';
+                        } else if (b.status === 'CANCELLED') {
+                            badgeBg = '#DC2626';
+                            badgeText = 'ĐÃ HỦY';
+                        }
+
                         const actionBtn = isPaid 
                             ? `<a href="/my-tickets.html" class="btn btn-outline btn-sm">Xem Vé & QR</a>`
-                            : `<a href="/booking.html" class="btn btn-primary btn-sm">Chi Tiết</a>`;
+                            : (isPending 
+                                ? `<a href="/booking.html?id=${b.concertId || ''}" class="btn btn-primary btn-sm">Thanh Toán</a>`
+                                : `<a href="/booking.html?id=${b.concertId || ''}" class="btn btn-outline btn-sm">Chi Tiết</a>`);
 
                         return `
                             <tr style="border-bottom: 1px solid var(--border-light);">
-                                <td style="padding: 14px 18px; font-weight: 700; font-family: monospace;">${b.id.substring(0, 10)}...</td>
+                                <td style="padding: 14px 18px; font-weight: 700; font-family: monospace;">${(b.id || '').substring(0, 10)}...</td>
                                 <td style="padding: 14px 18px; font-weight: 700;">${b.concertTitle || 'Concert Live'}</td>
-                                <td style="padding: 14px 18px;">${b.items ? b.items.length : (b.seatIds ? b.seatIds.length : 1)} Ghế</td>
+                                <td style="padding: 14px 18px;">${ticketCount} Ghế</td>
                                 <td style="padding: 14px 18px; font-weight: 800;">${formatCurrency(b.finalAmount || b.totalAmount)}</td>
                                 <td style="padding: 14px 18px;">
                                     <span style="display: inline-block; padding: 3px 10px; border-radius: 9999px; background: ${badgeBg}; color: #FFFFFF; font-size: 11px; font-weight: 800;">

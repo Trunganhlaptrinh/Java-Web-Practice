@@ -299,7 +299,7 @@
                 const res = await apiFetch('/admin/stats');
                 document.getElementById('stat-bookings').textContent = res.data.totalBookings || 0;
                 document.getElementById('stat-revenue').textContent = formatCurrency(res.data.totalRevenue || 0);
-                document.getElementById('stat-tickets').textContent = res.data.totalTickets || 0;
+                document.getElementById('stat-tickets').textContent = res.data.totalTicketsIssued ?? res.data.totalTickets ?? 0;
             } catch (err) {}
         }
 
@@ -315,7 +315,7 @@
                 tbody.innerHTML = res.data.map(b => {
                     const code = b.id || b.bookingCode || 'BKG-' + (b.id ? b.id.substring(0,8) : '');
                     const customer = b.userFullName || b.userEmail || b.username || 'Khách hàng';
-                    const seats = b.items ? b.items.map(i => i.seatCode).join(', ') : (b.seatCodes ? b.seatCodes.join(', ') : (b.seatIds ? b.seatIds.length + ' ghế' : '1 ghế'));
+                    const seats = b.items && b.items.length > 0 ? b.items.map(i => i.seatNumber || i.seatCode).join(', ') : (b.seatCodes ? b.seatCodes.join(', ') : (b.seatIds ? b.seatIds.length + ' ghế' : '1 ghế'));
                     const amount = b.finalAmount != null ? b.finalAmount : (b.totalAmount || 0);
                     const date = b.createdAt || b.updatedAt;
                     return `

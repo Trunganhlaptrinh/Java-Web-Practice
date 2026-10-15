@@ -8,7 +8,6 @@ import com.concert.booking.model.Ticket;
 import com.concert.booking.repository.EmailBotConfigRepository;
 import com.concert.booking.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,10 +23,13 @@ import java.util.Properties;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
     private final EmailBotConfigRepository emailBotConfigRepository;
+
+    public EmailServiceImpl(EmailBotConfigRepository emailBotConfigRepository) {
+        this.emailBotConfigRepository = emailBotConfigRepository;
+    }
 
     @Override
     @Async
@@ -44,10 +46,10 @@ public class EmailServiceImpl implements EmailService {
                 mailSender.setPassword(config.getAppPassword());
 
                 Properties props = mailSender.getJavaMailProperties();
-                props.put("mail.transport.protocol", "smtp");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.starttls.enable", "true");
-                props.put("mail.debug", "false");
+                props.setProperty("mail.transport.protocol", "smtp");
+                props.setProperty("mail.smtp.auth", "true");
+                props.setProperty("mail.smtp.starttls.enable", "true");
+                props.setProperty("mail.debug", "false");
 
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -74,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public EmailBotConfigResponse saveEmailBotConfig(String adminUsername, EmailBotConfigRequest request) {
-        EmailBotConfig config = emailBotConfigRepository.findFirstByActiveTrueOrderByUpdatedAtDesc()
+        EmailBotConfig config = emailBotConfigRepository.findFirstByOrderByUpdatedAtDesc()
                 .orElse(new EmailBotConfig());
 
         config.setBotEmail(request.getEmail().trim());
@@ -84,7 +86,7 @@ public class EmailServiceImpl implements EmailService {
         config.setUpdatedAt(Instant.now());
 
         EmailBotConfig saved = emailBotConfigRepository.save(config);
-        log.info("Admin [{}] Ä‘Ã£ cáº­p nháº­t cáº¥u hÃ¬nh Email Bot: {}", adminUsername, saved.getBotEmail());
+        log.info("Admin [{}] đã cập nhật cấu hình Email Bot: {}", adminUsername, saved.getBotEmail());
 
         return EmailBotConfigResponse.builder()
                 .id(saved.getId())
@@ -97,7 +99,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public EmailBotConfigResponse getEmailBotConfig() {
-        return emailBotConfigRepository.findFirstByActiveTrueOrderByUpdatedAtDesc()
+        return emailBotConfigRepository.findFirstByOrderByUpdatedAtDesc()
                 .map(cfg -> EmailBotConfigResponse.builder()
                         .id(cfg.getId())
                         .email(cfg.getBotEmail())
@@ -109,7 +111,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void logMockEmail(Booking booking, List<Ticket> tickets) {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
         String amountStr = booking.getFinalAmount() != null ? currencyFormat.format(booking.getFinalAmount()) : "0 VND";
 
         log.info("====================================================================================");
@@ -127,7 +129,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private String buildHtmlContent(Booking booking, List<Ticket> tickets) {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
         String amountStr = booking.getFinalAmount() != null ? currencyFormat.format(booking.getFinalAmount()) : "0 VND";
 
         StringBuilder sb = new StringBuilder();

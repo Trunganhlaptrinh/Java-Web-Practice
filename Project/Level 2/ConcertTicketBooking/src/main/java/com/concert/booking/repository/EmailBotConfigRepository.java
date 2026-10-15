@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EmailBotConfigRepository extends MongoRepository<EmailBotConfig, String> {
     Optional<EmailBotConfig> findFirstByActiveTrueOrderByUpdatedAtDesc();
+    Optional<EmailBotConfig> findFirstByOrderByUpdatedAtDesc();
 }

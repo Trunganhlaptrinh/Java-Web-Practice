@@ -3,7 +3,6 @@ package com.concert.booking.service.impl;
 import com.concert.booking.exception.BadRequestException;
 import com.concert.booking.service.EmailService;
 import com.concert.booking.service.OtpService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +14,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
 
     private final EmailService emailService;
 
     // Cache lưu trữ mã OTP trong bộ nhớ (Email -> OtpEntry)
     private final Map<String, OtpEntry> otpStorage = new ConcurrentHashMap<>();
+
+    public OtpServiceImpl(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     private record OtpEntry(String code, Instant expireAt) {}
 
@@ -58,7 +60,7 @@ public class OtpServiceImpl implements OtpService {
             throw new BadRequestException("Mã OTP đã hết hạn hiệu lực 5 phút! Vui lòng yêu cầu mã mới.");
         }
 
-        if (!entry.code().equals(otpCode.trim())) {
+        if (otpCode == null || !entry.code().equals(otpCode.trim())) {
             throw new BadRequestException("Mã OTP không chính xác. Vui lòng kiểm tra lại!");
         }
 

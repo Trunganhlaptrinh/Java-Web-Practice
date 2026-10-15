@@ -4,7 +4,7 @@ services:
     container_name: ctb-mongodb
     restart: unless-stopped
     ports:
-      - "27018:27017"
+      - "27017:27017"
     volumes:
       - ctb_mongo_data:/data/db
     healthcheck:
@@ -22,6 +22,7 @@ services:
         condition: service_healthy
     environment:
       MONGODB_URI: "mongodb://db:27017/concert_booking"
+      JWT_SECRET: "ConcertTicketBookingSecretKeyLevel2SecurityTokenMustBe256BitsLong2026"
     ports:
       - "8080:8080"
 
